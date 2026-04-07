@@ -11,390 +11,117 @@
     --surface: #13131a;
     --surface2: #1c1c26;
     --border: rgba(255,255,255,0.07);
-    --accent: #4f8ef7;
-    --accent2: #7c5cfa;
+    --accent: #ff6b1a;
+    --accent-hover: #e85c0d;
     --good: #3ecf8e;
     --bad: #f66;
     --text: #f0f0f5;
     --muted: #7a7a90;
-    --amber: #f5a623;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; }
 
-  /* NAV */
   nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 2rem;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: rgba(10,10,15,0.92);
-    backdrop-filter: blur(12px);
-    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 2rem; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px); z-index: 100;
   }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--text); }
   .logo span { color: var(--accent); }
-  .nav-badge {
-    font-size: 12px;
-    background: rgba(79,142,247,0.12);
-    color: var(--accent);
-    border: 1px solid rgba(79,142,247,0.25);
-    padding: 4px 12px;
-    border-radius: 20px;
-  }
+  .nav-badge { font-size: 12px; background: rgba(255,107,26,0.1); color: var(--accent); border: 1px solid rgba(255,107,26,0.25); padding: 4px 12px; border-radius: 20px; }
 
-  /* HERO */
-  .hero {
-    text-align: center;
-    padding: 5rem 2rem 4rem;
-    max-width: 700px;
-    margin: 0 auto;
-  }
+  .hero { text-align: center; padding: 5rem 2rem 4rem; max-width: 750px; margin: 0 auto; }
   .hero-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12px;
-    color: var(--good);
-    background: rgba(62,207,142,0.08);
-    border: 1px solid rgba(62,207,142,0.2);
-    padding: 5px 14px;
-    border-radius: 20px;
-    margin-bottom: 1.75rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--good); background: rgba(62,207,142,0.08);
+    border: 1px solid rgba(62,207,142,0.3); padding: 9px 20px;
+    border-radius: 4px; margin-bottom: 2rem;
   }
-  .hero-chip::before {
-    content: '';
-    width: 6px; height: 6px;
-    background: var(--good);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  .hero-chip::before { content: ''; width: 7px; height: 7px; background: var(--good); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .hero h1 {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    margin-bottom: 1.25rem;
-    color: var(--text);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800; line-height: 1.05; letter-spacing: -2px;
+    margin-bottom: 1.25rem; color: var(--text);
   }
-  .hero h1 em {
-    font-style: normal;
-    color: var(--accent);
-  }
-  .hero p {
-    font-size: 16px;
-    color: var(--muted);
-    max-width: 480px;
-    margin: 0 auto 2.5rem;
-    line-height: 1.7;
-  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p { font-size: 16px; color: var(--muted); max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.7; }
   .hero-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--accent);
-    color: white;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 15px;
-    padding: 13px 28px;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: opacity 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: white; font-weight: 500; font-size: 15px;
+    padding: 14px 32px; border-radius: 10px; text-decoration: none; transition: background 0.15s;
   }
-  .hero-cta:hover { opacity: 0.85; }
+  .hero-cta:hover { background: var(--accent-hover); }
 
-  /* DIFF SECTION */
   .section { padding: 3rem 2rem; max-width: 900px; margin: 0 auto; }
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.5rem;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.4rem, 3vw, 2rem);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin-bottom: 2rem;
-  }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2rem; }
 
-  .diff-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
+  .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media(max-width:600px){ .diff-grid { grid-template-columns: 1fr; } }
-  .diff-col {
-    background: var(--surface);
-    padding: 1.5rem;
-  }
-  .diff-col-title {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .diff-col { border-radius: 14px; padding: 1.5rem; }
+  .diff-col.bad { background: rgba(255,102,102,0.05); border: 1px solid rgba(255,102,102,0.15); }
+  .diff-col.good { background: rgba(62,207,142,0.06); border: 1px solid rgba(62,207,142,0.2); }
+  .diff-col-title { font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
   .diff-col.bad .diff-col-title { color: var(--bad); }
   .diff-col.good .diff-col-title { color: var(--good); }
-  .diff-col-title span {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
+  .diff-col-title span { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
   .diff-col.bad .diff-col-title span { background: var(--bad); }
   .diff-col.good .diff-col-title span { background: var(--good); }
-  .ditem {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 14px;
-    margin-bottom: 10px;
-    line-height: 1.5;
-  }
-  .diff-col.bad .ditem { color: var(--muted); }
-  .diff-col.good .ditem { color: var(--text); }
-  .ditem-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 6px;
-  }
+  .ditem { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; margin-bottom: 12px; line-height: 1.5; }
+  .diff-col.bad .ditem { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(255,102,102,0.3); }
+  .diff-col.good .ditem { color: var(--text); font-weight: 500; }
+  .ditem-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
   .diff-col.bad .ditem-dot { background: var(--bad); opacity: 0.5; }
   .diff-col.good .ditem-dot { background: var(--good); }
 
-  /* PRODUCTS */
   #productos { padding: 1rem 2rem 4rem; max-width: 960px; margin: 0 auto; }
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-top: 2rem;
-  }
-  .pcard {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-  .pcard:hover { border-color: rgba(79,142,247,0.3); transform: translateY(-2px); }
-  .pcard.featured {
-    border-color: rgba(79,142,247,0.5);
-    background: linear-gradient(135deg, #13131a 0%, #161620 100%);
-  }
-  .ptag {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 12px;
-    border-radius: 20px;
-    margin-bottom: 1rem;
-    align-self: flex-start;
-  }
-  .ptag-amber { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
-  .ptag-blue  { background: rgba(79,142,247,0.12); color: var(--accent); border: 1px solid rgba(79,142,247,0.25); }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 2rem; }
+  .pcard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; transition: border-color 0.2s, transform 0.2s; }
+  .pcard:hover { border-color: rgba(255,107,26,0.3); transform: translateY(-2px); }
+  .pcard.featured { border-color: rgba(255,107,26,0.5); }
+  .ptag { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 12px; border-radius: 20px; margin-bottom: 1rem; align-self: flex-start; }
+  .ptag-amber,.ptag-blue { background: rgba(255,107,26,0.1); color: var(--accent); border: 1px solid rgba(255,107,26,0.25); }
   .ptag-green { background: rgba(62,207,142,0.1); color: var(--good); border: 1px solid rgba(62,207,142,0.2); }
-  .picon { font-size: 36px; margin-bottom: 12px; }
-  .pname {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: var(--text);
-  }
+  .pname { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
   .pdesc { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; flex: 1; }
-  .pprice {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 3px;
-  }
-  .pprice-sub { font-size: 12px; color: var(--muted); margin-bottom: 1.25rem; }
-  .pbtn {
-    width: 100%;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 9px;
-    padding: 11px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    text-decoration: none;
-    display: block;
-    text-align: center;
-  }
-  .pbtn:hover { opacity: 0.85; }
+  .pprice { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .pprice-sub { font-size: 12px; color: var(--muted); margin-bottom: 1rem; }
+  .pbtn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 9px; padding: 11px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; text-decoration: none; display: block; text-align: center; }
+  .pbtn:hover { background: var(--accent-hover); }
+  .btn-video { width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 9px; padding: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: border-color 0.15s, color 0.15s; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .btn-video:hover { border-color: rgba(255,107,26,0.4); color: var(--accent); }
 
-  /* TRUST */
-  .trust-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    padding: 0 2rem 4rem;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  .titem {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 18px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  /* CTA */
-  .cta-section {
-    text-align: center;
-    padding: 3rem 2rem 5rem;
-    border-top: 1px solid var(--border);
-  }
-  .cta-section p { font-size: 14px; color: var(--muted); margin-bottom: 1.25rem; }
-  .btn-wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    background: #25D366;
-    color: white;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 15px;
-    padding: 13px 28px;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: opacity 0.15s;
-    border: none;
-    cursor: pointer;
-  }
-  .btn-wa:hover { opacity: 0.85; }
-
-  .no-products {
-    text-align: center;
-    padding: 3rem;
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  /* GALLERY */
-  .gallery {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4/3;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 1rem;
-    background: var(--surface2);
-  }
-  .gallery img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 0.35s;
-  }
+  .gallery { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; background: var(--surface2); }
+  .gallery img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.35s; }
   .gallery img.active { opacity: 1; }
-  .gallery-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-  }
+  .gallery-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; }
   .gallery-btn:hover { background: rgba(0,0,0,0.8); }
   .gallery-btn.prev { left: 8px; }
   .gallery-btn.next { right: 8px; }
-  .gallery-dots {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 5px;
-    z-index: 2;
-  }
-  .gallery-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
+  .gallery-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
+  .gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; }
   .gallery-dot.active { background: white; }
-  .gallery-placeholder {
-    width: 100%;
-    aspect-ratio: 4/3;
-    border-radius: 10px;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    margin-bottom: 1rem;
-  }
-  .pvideo {
-    width: 100%;
-    aspect-ratio: 16/9;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 1rem;
-    background: var(--surface2);
-  }
-  .pvideo iframe { width: 100%; height: 100%; border: none; }
+  .gallery-placeholder { width: 100%; aspect-ratio: 4/3; border-radius: 10px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 1rem; }
+
+  .video-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; padding: 2rem; }
+  .video-overlay.open { display: flex; }
+  .video-modal { width: 100%; max-width: 760px; position: relative; }
+  .video-modal iframe { width: 100%; aspect-ratio: 16/9; border: none; border-radius: 12px; display: block; }
+  .video-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 28px; cursor: pointer; line-height: 1; }
+
+  .trust-strip { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 0 2rem 4rem; max-width: 800px; margin: 0 auto; }
+  .titem { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 13px; color: var(--muted); }
+
+  .cta-section { text-align: center; padding: 3rem 2rem 5rem; border-top: 1px solid var(--border); }
+  .cta-section p { font-size: 14px; color: var(--muted); margin-bottom: 1.25rem; }
+  .btn-wa { display: inline-flex; align-items: center; gap: 9px; background: #25D366; color: white; font-weight: 500; font-size: 15px; padding: 13px 28px; border-radius: 10px; text-decoration: none; transition: opacity 0.15s; border: none; cursor: pointer; }
+  .btn-wa:hover { opacity: 0.85; }
+  .no-products { text-align: center; padding: 3rem; color: var(--muted); font-size: 14px; }
 </style>
 </head>
 <body>
@@ -413,22 +140,25 @@
 
 <div class="section">
   <div class="section-label">La diferencia</div>
-  <div class="section-title">Por qué los nuestros son distintos</div>
+  <div class="section-title">🔥 ¿Por qué nuestros TV Box son distintos?</div>
   <div class="diff-grid">
     <div class="diff-col bad">
-      <div class="diff-col-title"><span></span>TV Box sin optimizar</div>
-      <div class="ditem"><span class="ditem-dot"></span>Lleno de apps que nunca vas a usar</div>
-      <div class="ditem"><span class="ditem-dot"></span>Lento desde el primer día</div>
+      <div class="diff-col-title"><span></span>❌ Otros TV Box</div>
+      <div class="ditem"><span class="ditem-dot"></span>Llenos de apps que no usas</div>
+      <div class="ditem"><span class="ditem-dot"></span>Lentos desde el primer día</div>
       <div class="ditem"><span class="ditem-dot"></span>Memoria ocupada en segundo plano</div>
-      <div class="ditem"><span class="ditem-dot"></span>Tarda en abrir Netflix o YouTube</div>
+      <div class="ditem"><span class="ditem-dot"></span>Demoran en abrir apps</div>
     </div>
     <div class="diff-col good">
-      <div class="diff-col-title"><span></span>Nuestros equipos</div>
-      <div class="ditem"><span class="ditem-dot"></span>Solo lo que necesitas, nada más</div>
-      <div class="ditem"><span class="ditem-dot"></span>Rápido desde que lo enchufas</div>
-      <div class="ditem"><span class="ditem-dot"></span>Toda la memoria libre para ti</div>
-      <div class="ditem"><span class="ditem-dot"></span>Abre todo al tiro, sin esperas</div>
+      <div class="diff-col-title"><span></span>✅ Nuestros equipos</div>
+      <div class="ditem"><span class="ditem-dot"></span>Solo lo necesario, sin basura</div>
+      <div class="ditem"><span class="ditem-dot"></span>Rápidos desde que los conectas</div>
+      <div class="ditem"><span class="ditem-dot"></span>Memoria libre para mejor rendimiento</div>
+      <div class="ditem"><span class="ditem-dot"></span>Abren apps al instante, sin esperas</div>
     </div>
+  </div>
+  <div style="margin-top:12px;background:rgba(255,107,26,0.08);border:1px solid rgba(255,107,26,0.2);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:500;color:var(--accent);text-align:center;">
+    ⚡ Resultado: una experiencia fluida, sin lag
   </div>
 </div>
 
@@ -444,7 +174,7 @@
   <div class="titem">🚀 Optimizado antes de enviarlo</div>
   <div class="titem">🚚 Envío rápido</div>
   <div class="titem">🔧 Te ayudamos a instalarlo</div>
-  <div class="titem">✅ 1 Mes de Garantia</div>
+  <div class="titem">✅ Garantía incluida</div>
   <div class="titem">💳 Transferencia o efectivo</div>
 </div>
 
@@ -456,9 +186,16 @@
   </a>
 </div>
 
+<div class="video-overlay" id="video-overlay" onclick="closeVideo(event)">
+  <div class="video-modal">
+    <button class="video-close" onclick="closeVideoBtn()">✕</button>
+    <iframe id="video-iframe" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDhyUnOAfLaenLwC_5ekkPJjvlhpLg_RS4",
@@ -471,66 +208,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const ICONS = { amber:'📦', blue:'🖥️', green:'🚀' };
 const TAG_LABELS = { amber:'Para empezar', blue:'Más vendido', green:'Lo mejor' };
-
-function loadProducts() {
-  try {
-    const data = localStorage.getItem('tvbox_products');
-    const config = localStorage.getItem('tvbox_config');
-    const products = data ? JSON.parse(data) : getDefaultProducts();
-    const cfg = config ? JSON.parse(config) : { wa: '56912345678' };
-
-    const waLink = document.getElementById('wa-link');
-    waLink.href = `https://wa.me/${cfg.wa.replace(/[^0-9]/g,'')}`;
-
-    const grid = document.getElementById('products-grid');
-    if (!products.length) {
-      grid.innerHTML = '<div class="no-products">No hay productos disponibles por ahora.</div>';
-      return;
-    }
-    grid.innerHTML = products.map(p => {
-      const photos = (p.photos || []).filter(u => u && u.trim());
-      const videoId = getYoutubeId(p.video || '');
-
-      let mediaHtml = '';
-      if (photos.length > 0) {
-        const imgs = photos.map((u,i) => `<img src="${u}" class="${i===0?'active':''}" data-index="${i}">`).join('');
-        const dots = photos.length > 1 ? `<div class="gallery-dots">${photos.map((_,i) => `<span class="gallery-dot ${i===0?'active':''}" data-index="${i}"></span>`).join('')}</div>` : '';
-        const arrows = photos.length > 1 ? `<button class="gallery-btn prev" onclick="galleryMove(this,-1)">&#8249;</button><button class="gallery-btn next" onclick="galleryMove(this,1)">&#8250;</button>` : '';
-        mediaHtml = `<div class="gallery">${imgs}${arrows}${dots}</div>`;
-      } else {
-        mediaHtml = `<div class="gallery-placeholder">${ICONS[p.tag] || '📺'}</div>`;
-      }
-
-      const videoHtml = videoId ? `<div class="pvideo"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>` : '';
-
-      return `
-        <div class="pcard ${p.featured ? 'featured' : ''}">
-          <span class="ptag ptag-${p.tag}">${TAG_LABELS[p.tag] || ''}</span>
-          ${mediaHtml}
-          ${videoHtml}
-          <div class="pname">${p.name}</div>
-          <div class="pdesc">${p.desc}</div>
-          <div class="pprice">$${p.price}</div>
-          <div class="pprice-sub">precio final · envío incluido</div>
-          <a href="https://wa.me/${cfg.wa.replace(/[^0-9]/g,'')}?text=Hola!%20Me%20interesa%20el%20${encodeURIComponent(p.name)}" target="_blank" class="pbtn">Lo quiero →</a>
-        </div>
-      `;
-    }).join('');
-  } catch(e) {
-    console.error(e);
-  }
-}
-
-function getDefaultProducts() {
-  return [
-    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series. Optimizado para que todo abra rápido y sin trabas.',          price:'XX.XXX', tag:'amber', featured:false },
-    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen. El favorito de nuestros clientes. Optimizado igual que todos.', price:'XX.XXX', tag:'blue',  featured:true  },
-    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible. Para el que no quiere compromisos.',                        price:'XX.XXX', tag:'green', featured:false },
-  ];
-}
 
 function getYoutubeId(url) {
   if (!url) return '';
@@ -539,61 +218,65 @@ function getYoutubeId(url) {
 }
 
 function galleryMove(btn, dir) {
-  const gallery = btn.closest('.gallery');
-  const imgs = Array.from(gallery.querySelectorAll('img'));
-  const dots = Array.from(gallery.querySelectorAll('.gallery-dot'));
-  let current = imgs.findIndex(i => i.classList.contains('active'));
-  imgs[current].classList.remove('active');
-  if (dots[current]) dots[current].classList.remove('active');
-  current = (current + dir + imgs.length) % imgs.length;
-  imgs[current].classList.add('active');
-  if (dots[current]) dots[current].classList.add('active');
+  const g = btn.closest('.gallery');
+  const imgs = Array.from(g.querySelectorAll('img'));
+  const dots = Array.from(g.querySelectorAll('.gallery-dot'));
+  let cur = imgs.findIndex(i => i.classList.contains('active'));
+  imgs[cur].classList.remove('active'); if(dots[cur]) dots[cur].classList.remove('active');
+  cur = (cur + dir + imgs.length) % imgs.length;
+  imgs[cur].classList.add('active'); if(dots[cur]) dots[cur].classList.add('active');
 }
 
+function openVideo(videoId) {
+  document.getElementById('video-iframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  document.getElementById('video-overlay').classList.add('open');
+}
+function closeVideoBtn() {
+  document.getElementById('video-overlay').classList.remove('open');
+  document.getElementById('video-iframe').src = '';
+}
+function closeVideo(e) { if(e.target === document.getElementById('video-overlay')) closeVideoBtn(); }
+
 window.galleryMove = galleryMove;
+window.openVideo = openVideo;
+window.closeVideoBtn = closeVideoBtn;
+window.closeVideo = closeVideo;
 
 function renderGrid(products, cfg) {
   const grid = document.getElementById('products-grid');
   const wa = (cfg.wa || '56912345678').replace(/[^0-9]/g,'');
-  if (!products.length) {
-    grid.innerHTML = '<div class="no-products">No hay productos disponibles por ahora.</div>';
-    return;
-  }
+  if (!products.length) { grid.innerHTML = '<div class="no-products">No hay productos disponibles.</div>'; return; }
   grid.innerHTML = products.map(p => {
     const photos = (p.photos || []).filter(u => u && u.trim());
     const videoId = getYoutubeId(p.video || '');
-    let mediaHtml = '';
-    if (photos.length > 0) {
-      const imgs = photos.map((u,i) => `<img src="${u}" class="${i===0?'active':''}" data-index="${i}">`).join('');
-      const dots = photos.length > 1 ? `<div class="gallery-dots">${photos.map((_,i) => `<span class="gallery-dot ${i===0?'active':''}" data-index="${i}"></span>`).join('')}</div>` : '';
-      const arrows = photos.length > 1 ? `<button class="gallery-btn prev" onclick="galleryMove(this,-1)">&#8249;</button><button class="gallery-btn next" onclick="galleryMove(this,1)">&#8250;</button>` : '';
-      mediaHtml = `<div class="gallery">${imgs}${arrows}${dots}</div>`;
-    } else {
-      mediaHtml = `<div class="gallery-placeholder">${ICONS[p.tag] || '📺'}</div>`;
-    }
-    const videoHtml = videoId ? `<div class="pvideo"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>` : '';
+    let mediaHtml = photos.length > 0
+      ? `<div class="gallery">
+          ${photos.map((u,i) => `<img src="${u}" class="${i===0?'active':''}">`).join('')}
+          ${photos.length > 1 ? `<button class="gallery-btn prev" onclick="galleryMove(this,-1)">&#8249;</button><button class="gallery-btn next" onclick="galleryMove(this,1)">&#8250;</button><div class="gallery-dots">${photos.map((_,i)=>`<span class="gallery-dot ${i===0?'active':''}"></span>`).join('')}</div>` : ''}
+        </div>`
+      : `<div class="gallery-placeholder">${ICONS[p.tag]||'📺'}</div>`;
+    const videoBtn = videoId
+      ? `<button class="btn-video" onclick="openVideo('${videoId}')">▶ Ver video del producto</button>`
+      : '';
     return `
-      <div class="pcard ${p.featured ? 'featured' : ''}">
-        <span class="ptag ptag-${p.tag}">${TAG_LABELS[p.tag] || ''}</span>
+      <div class="pcard ${p.featured?'featured':''}">
+        <span class="ptag ptag-${p.tag}">${TAG_LABELS[p.tag]||''}</span>
         ${mediaHtml}
-        ${videoHtml}
         <div class="pname">${p.name}</div>
         <div class="pdesc">${p.desc}</div>
         <div class="pprice">$${p.price}</div>
         <div class="pprice-sub">precio final · envío incluido</div>
+        ${videoBtn}
         <a href="https://wa.me/${wa}?text=Hola!%20Me%20interesa%20el%20${encodeURIComponent(p.name)}" target="_blank" class="pbtn">Lo quiero →</a>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
-onSnapshot(doc(db, 'tienda', 'config'), snap => {
-  const cfg = snap.exists() ? snap.data() : { wa: '56912345678' };
-  const waLink = document.getElementById('wa-link');
-  waLink.href = `https://wa.me/${(cfg.wa||'56912345678').replace(/[^0-9]/g,'')}`;
-  onSnapshot(doc(db, 'tienda', 'productos'), psnap => {
-    const products = psnap.exists() ? (psnap.data().lista || []) : [];
-    renderGrid(products, cfg);
+onSnapshot(doc(db,'tienda','config'), snap => {
+  const cfg = snap.exists() ? snap.data() : { wa:'56912345678' };
+  document.getElementById('wa-link').href = `https://wa.me/${(cfg.wa||'56912345678').replace(/[^0-9]/g,'')}`;
+  onSnapshot(doc(db,'tienda','productos'), psnap => {
+    renderGrid(psnap.exists() ? (psnap.data().lista||[]) : [], cfg);
   });
 });
 </script>
