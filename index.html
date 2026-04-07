@@ -80,7 +80,7 @@
   .diff-col.good .ditem-dot { background: var(--good); }
 
   #productos { padding: 1rem 2rem 4rem; max-width: 960px; margin: 0 auto; }
-  .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 2rem; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, min(100%, 380px))); gap: 16px; margin-top: 2rem; justify-content: center; }
   .pcard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; transition: border-color 0.2s, transform 0.2s; }
   .pcard:hover { border-color: rgba(255,107,26,0.3); transform: translateY(-2px); }
   .pcard.featured { border-color: rgba(255,107,26,0.5); }
@@ -93,8 +93,8 @@
   .pprice-sub { font-size: 12px; color: var(--muted); margin-bottom: 1rem; }
   .pbtn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 9px; padding: 11px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; text-decoration: none; display: block; text-align: center; }
   .pbtn:hover { background: var(--accent-hover); }
-  .btn-video { width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 9px; padding: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: border-color 0.15s, color 0.15s; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; }
-  .btn-video:hover { border-color: rgba(255,107,26,0.4); color: var(--accent); }
+  .btn-video { width: 100%; background: rgba(255,107,26,0.12); color: var(--accent); border: 1px solid rgba(255,107,26,0.35); border-radius: 9px; padding: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, border-color 0.15s; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .btn-video:hover { background: rgba(255,107,26,0.2); border-color: rgba(255,107,26,0.6); }
 
   .gallery { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; background: var(--surface2); }
   .gallery img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.35s; }
@@ -256,7 +256,7 @@ function renderGrid(products, cfg) {
         </div>`
       : `<div class="gallery-placeholder">${ICONS[p.tag]||'📺'}</div>`;
     const videoBtn = videoId
-      ? `<button class="btn-video" onclick="openVideo('${videoId}')">▶ Ver video del producto</button>`
+      ? `<button class="btn-video" onclick="openVideo('${videoId}')">🎬 Ver video del producto</button>`
       : '';
     return `
       <div class="pcard ${p.featured?'featured':''}">
