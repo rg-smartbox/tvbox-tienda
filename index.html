@@ -456,7 +456,22 @@
   </a>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDhyUnOAfLaenLwC_5ekkPJjvlhpLg_RS4",
+  authDomain: "tvbox-tienda.firebaseapp.com",
+  projectId: "tvbox-tienda",
+  storageBucket: "tvbox-tienda.firebasestorage.app",
+  messagingSenderId: "621421300942",
+  appId: "1:621421300942:web:a7eef5446ac6343f1c949f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const ICONS = { amber:'📦', blue:'🖥️', green:'🚀' };
 const TAG_LABELS = { amber:'Para empezar', blue:'Más vendido', green:'Lo mejor' };
 
@@ -535,8 +550,52 @@ function galleryMove(btn, dir) {
   if (dots[current]) dots[current].classList.add('active');
 }
 
-loadProducts();
-window.addEventListener('storage', loadProducts);
+window.galleryMove = galleryMove;
+
+function renderGrid(products, cfg) {
+  const grid = document.getElementById('products-grid');
+  const wa = (cfg.wa || '56912345678').replace(/[^0-9]/g,'');
+  if (!products.length) {
+    grid.innerHTML = '<div class="no-products">No hay productos disponibles por ahora.</div>';
+    return;
+  }
+  grid.innerHTML = products.map(p => {
+    const photos = (p.photos || []).filter(u => u && u.trim());
+    const videoId = getYoutubeId(p.video || '');
+    let mediaHtml = '';
+    if (photos.length > 0) {
+      const imgs = photos.map((u,i) => `<img src="${u}" class="${i===0?'active':''}" data-index="${i}">`).join('');
+      const dots = photos.length > 1 ? `<div class="gallery-dots">${photos.map((_,i) => `<span class="gallery-dot ${i===0?'active':''}" data-index="${i}"></span>`).join('')}</div>` : '';
+      const arrows = photos.length > 1 ? `<button class="gallery-btn prev" onclick="galleryMove(this,-1)">&#8249;</button><button class="gallery-btn next" onclick="galleryMove(this,1)">&#8250;</button>` : '';
+      mediaHtml = `<div class="gallery">${imgs}${arrows}${dots}</div>`;
+    } else {
+      mediaHtml = `<div class="gallery-placeholder">${ICONS[p.tag] || '📺'}</div>`;
+    }
+    const videoHtml = videoId ? `<div class="pvideo"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>` : '';
+    return `
+      <div class="pcard ${p.featured ? 'featured' : ''}">
+        <span class="ptag ptag-${p.tag}">${TAG_LABELS[p.tag] || ''}</span>
+        ${mediaHtml}
+        ${videoHtml}
+        <div class="pname">${p.name}</div>
+        <div class="pdesc">${p.desc}</div>
+        <div class="pprice">$${p.price}</div>
+        <div class="pprice-sub">precio final · envío incluido</div>
+        <a href="https://wa.me/${wa}?text=Hola!%20Me%20interesa%20el%20${encodeURIComponent(p.name)}" target="_blank" class="pbtn">Lo quiero →</a>
+      </div>
+    `;
+  }).join('');
+}
+
+onSnapshot(doc(db, 'tienda', 'config'), snap => {
+  const cfg = snap.exists() ? snap.data() : { wa: '56912345678' };
+  const waLink = document.getElementById('wa-link');
+  waLink.href = `https://wa.me/${(cfg.wa||'56912345678').replace(/[^0-9]/g,'')}`;
+  onSnapshot(doc(db, 'tienda', 'productos'), psnap => {
+    const products = psnap.exists() ? (psnap.data().lista || []) : [];
+    renderGrid(products, cfg);
+  });
+});
 </script>
 </body>
 </html>

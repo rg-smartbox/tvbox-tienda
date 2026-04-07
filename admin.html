@@ -319,7 +319,7 @@
     <label class="login-label">Contraseña</label>
     <input type="password" class="login-input" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Entrar</button>
-    <div class="login-error" id="login-error">Usuario o contraseña incorrectos</div>}
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos</div>
   </div>
 </div>
 
@@ -366,7 +366,22 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDhyUnOAfLaenLwC_5ekkPJjvlhpLg_RS4",
+  authDomain: "tvbox-tienda.firebaseapp.com",
+  projectId: "tvbox-tienda",
+  storageBucket: "tvbox-tienda.firebasestorage.app",
+  messagingSenderId: "621421300942",
+  appId: "1:621421300942:web:a7eef5446ac6343f1c949f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const DEFAULT_PASS = 'admin123';
 const TAG_OPTS = [
   { key:'amber', label:'Para empezar' },
@@ -378,17 +393,16 @@ let products = [];
 let nextId = 10;
 let unsaved = false;
 
-function getCredentials() {
-  return {
-    user: localStorage.getItem('tvbox_username') || 'admin',
-    pass: localStorage.getItem('tvbox_password') || DEFAULT_PASS,
-  };
+async function getCredentials() {
+  const snap = await getDoc(doc(db, 'tienda', 'admin'));
+  if (snap.exists()) return snap.data();
+  return { user: 'admin', pass: DEFAULT_PASS };
 }
 
-function doLogin() {
+async function doLogin() {
   const user = document.getElementById('user-input').value.trim();
   const pass = document.getElementById('pw-input').value;
-  const creds = getCredentials();
+  const creds = await getCredentials();
   if (user === creds.user && pass === creds.pass) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-screen').style.display = 'block';
@@ -406,11 +420,11 @@ function logout() {
   document.getElementById('pw-input').value = '';
 }
 
-function loadData() {
-  const raw = localStorage.getItem('tvbox_products');
-  const cfg = localStorage.getItem('tvbox_config');
-  products = raw ? JSON.parse(raw) : getDefaultProducts();
-  const waVal = cfg ? JSON.parse(cfg).wa : '+56912345678';
+async function loadData() {
+  const psnap = await getDoc(doc(db, 'tienda', 'productos'));
+  const csnap = await getDoc(doc(db, 'tienda', 'config'));
+  products = psnap.exists() ? (psnap.data().lista || []) : getDefaultProducts();
+  const waVal = csnap.exists() ? (csnap.data().wa || '+56912345678') : '+56912345678';
   document.getElementById('wa-cfg').value = waVal;
   nextId = products.reduce((m,p) => Math.max(m, p.id), 0) + 1;
   renderList();
@@ -418,14 +432,14 @@ function loadData() {
 
 function getDefaultProducts() {
   return [
-    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series. Optimizado para que todo abra rápido y sin trabas.',          price:'XX.XXX', tag:'amber', featured:false },
-    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen. El favorito de nuestros clientes.',                            price:'XX.XXX', tag:'blue',  featured:true  },
-    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible. Para el que no quiere compromisos.',                       price:'XX.XXX', tag:'green', featured:false },
+    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series. Optimizado para que todo abra rápido y sin trabas.',          price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'' },
+    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen. El favorito de nuestros clientes.',                            price:'XX.XXX', tag:'blue',  featured:true,  photos:[], video:'' },
+    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible. Para el que no quiere compromisos.',                       price:'XX.XXX', tag:'green', featured:false, photos:[], video:'' },
   ];
 }
 
 function addProduct() {
-  products.push({ id: nextId++, name:'Nuevo modelo', desc:'Descripción del equipo.', price:'XX.XXX', tag:'amber', featured:false });
+  products.push({ id: nextId++, name:'Nuevo modelo', desc:'Descripción del equipo.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'' });
   renderList();
   markUnsaved();
 }
@@ -484,21 +498,12 @@ function renderList() {
           `).join('')}
         </div>
         <div class="field field-full">
-          <label>Video de YouTube (link o ID)</label>
+          <label>Video de YouTube (link)</label>
           <input type="text" placeholder="https://youtube.com/watch?v=..." value="${p.video||''}" oninput="updateField(${p.id},'video',this.value)">
         </div>
       </div>
     </div>
   `}).join('');
-}
-
-function updatePhoto(id, index, value) {
-  const p = products.find(p => p.id === id);
-  if (p) {
-    if (!p.photos) p.photos = ['','',''];
-    p.photos[index] = value;
-    markUnsaved();
-  }
 }
 
 function updateField(id, field, value) {
@@ -512,6 +517,15 @@ function updateField(id, field, value) {
   }
 }
 
+function updatePhoto(id, index, value) {
+  const p = products.find(p => p.id === id);
+  if (p) {
+    if (!p.photos) p.photos = ['','',''];
+    p.photos[index] = value;
+    markUnsaved();
+  }
+}
+
 function markUnsaved() {
   unsaved = true;
   const s = document.getElementById('save-status');
@@ -519,10 +533,10 @@ function markUnsaved() {
   s.className = 'save-status';
 }
 
-function saveAll() {
-  localStorage.setItem('tvbox_products', JSON.stringify(products));
+async function saveAll() {
   const wa = document.getElementById('wa-cfg').value;
-  localStorage.setItem('tvbox_config', JSON.stringify({ wa }));
+  await setDoc(doc(db, 'tienda', 'productos'), { lista: products });
+  await setDoc(doc(db, 'tienda', 'config'), { wa });
   unsaved = false;
   const s = document.getElementById('save-status');
   s.textContent = '¡Guardado! Los cambios ya se ven en la página.';
@@ -533,22 +547,15 @@ function saveAll() {
   }, 3000);
 }
 
-function changePassword() {
+async function changePassword() {
   const newUser = document.getElementById('new-user').value.trim();
   const p1 = document.getElementById('new-pw').value;
   const p2 = document.getElementById('new-pw2').value;
   const msg = document.getElementById('pw-msg');
-  if (!newUser) {
-    msg.className = 'pw-msg err'; msg.textContent = 'El usuario no puede estar vacío.'; return;
-  }
-  if (!p1 || p1.length < 4) {
-    msg.className = 'pw-msg err'; msg.textContent = 'La contraseña debe tener al menos 4 caracteres.'; return;
-  }
-  if (p1 !== p2) {
-    msg.className = 'pw-msg err'; msg.textContent = 'Las contraseñas no coinciden.'; return;
-  }
-  localStorage.setItem('tvbox_username', newUser);
-  localStorage.setItem('tvbox_password', p1);
+  if (!newUser) { msg.className = 'pw-msg err'; msg.textContent = 'El usuario no puede estar vacío.'; return; }
+  if (!p1 || p1.length < 4) { msg.className = 'pw-msg err'; msg.textContent = 'La contraseña debe tener al menos 4 caracteres.'; return; }
+  if (p1 !== p2) { msg.className = 'pw-msg err'; msg.textContent = 'Las contraseñas no coinciden.'; return; }
+  await setDoc(doc(db, 'tienda', 'admin'), { user: newUser, pass: p1 });
   document.getElementById('new-user').value = '';
   document.getElementById('new-pw').value = '';
   document.getElementById('new-pw2').value = '';
@@ -556,6 +563,15 @@ function changePassword() {
   msg.textContent = 'Credenciales actualizadas correctamente.';
   setTimeout(() => { msg.textContent = ''; }, 3000);
 }
+
+window.doLogin = doLogin;
+window.logout = logout;
+window.addProduct = addProduct;
+window.removeProduct = removeProduct;
+window.updateField = updateField;
+window.updatePhoto = updatePhoto;
+window.saveAll = saveAll;
+window.changePassword = changePassword;
 
 window.addEventListener('beforeunload', e => {
   if (unsaved) { e.preventDefault(); e.returnValue = ''; }
