@@ -721,15 +721,17 @@ window.crearUsuario=crearUsuario; window.eliminarUsuario=eliminarUsuario;
 window.anularVenta=anularVenta;
 window.fmt=fmt; window.cleanPrice=cleanPrice;
 
-document.getElementById('login-btn').addEventListener('click', doLogin);
-document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('pw-input').focus(); });
-document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('login-btn').addEventListener('click', doLogin);
+  document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('pw-input').focus(); });
+  document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
-if (sessionStorage.getItem('tvbox_admin_logged')) {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'block';
-  loadData();
-}
+  if (sessionStorage.getItem('tvbox_admin_logged')) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    loadData();
+  }
+});
 
 document.addEventListener('click', e => {
   const btn = e.target.closest('[data-action]');
