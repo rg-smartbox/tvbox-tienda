@@ -241,15 +241,6 @@ function logout() {
   currentUser = null;
 }
 
-const savedUser = sessionStorage.getItem('tvbox_vendedor');
-if (savedUser) {
-  currentUser = savedUser;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('main-screen').style.display = 'block';
-  document.getElementById('vendedor-nombre').textContent = currentUser;
-  loadData();
-}
-
 let unsubProducts = null;
 let unsubVentas = null;
 
@@ -399,6 +390,19 @@ document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key=
 
 window.switchTab = switchTab;
 window.logout = logout;
+
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('pw-input').focus(); });
+document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+const savedUser = sessionStorage.getItem('tvbox_vendedor');
+if (savedUser) {
+  currentUser = savedUser;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+  document.getElementById('vendedor-nombre').textContent = currentUser;
+  loadData();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-vender').addEventListener('click', registrarVenta);
