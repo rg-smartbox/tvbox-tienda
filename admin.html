@@ -170,14 +170,14 @@
           <div class="sidebar" id="sidebar">
             <div class="sidebar-title">Resumen</div>
             <div class="metric-card">
-              <div class="metric-label">Inversión total</div>
-              <div class="metric-val amber" id="m-inversion">$0</div>
-              <div class="metric-sub">costo × stock</div>
+              <div class="metric-label">Ganancia realizada</div>
+              <div class="metric-val green" id="m-ganancia-real">$0</div>
+              <div class="metric-sub">por ventas cerradas</div>
             </div>
             <div class="metric-card">
-              <div class="metric-label">Ganancia potencial</div>
-              <div class="metric-val green" id="m-ganancia">$0</div>
-              <div class="metric-sub">si vendes todo</div>
+              <div class="metric-label">Inversión en stock</div>
+              <div class="metric-val amber" id="m-inversion">$0</div>
+              <div class="metric-sub">costo × stock actual</div>
             </div>
             <div class="metric-card">
               <div class="metric-label">Margen promedio</div>
@@ -188,6 +188,10 @@
               <div class="metric-label">Unidades en stock</div>
               <div class="metric-val" id="m-stock" style="color:var(--text)">0</div>
               <div class="metric-sub">total disponibles</div>
+            </div>
+            <div class="metric-card" id="m-vendidos-card">
+              <div class="metric-label">Vendidos por producto</div>
+              <div id="m-vendidos-list" style="margin-top:6px;"></div>
             </div>
           </div>
 
@@ -306,35 +310,43 @@ async function loadData() {
 
 function getDefaultProducts() {
   return [
-    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series. Optimizado para que todo abra rápido y sin trabas.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0 },
-    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen. El favorito de nuestros clientes.',                  price:'XX.XXX', tag:'blue',  featured:true,  photos:[], video:'', stock:0, costo:0 },
-    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible. Para el que no quiere compromisos.',             price:'XX.XXX', tag:'green', featured:false, photos:[], video:'', stock:0, costo:0 },
+    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series. Optimizado para que todo abra rápido y sin trabas.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0, vendidos:0 },
+    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen. El favorito de nuestros clientes.',                  price:'XX.XXX', tag:'blue',  featured:true,  photos:[], video:'', stock:0, costo:0, vendidos:0 },
+    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible. Para el que no quiere compromisos.',             price:'XX.XXX', tag:'green', featured:false, photos:[], video:'', stock:0, costo:0, vendidos:0 },
   ];
 }
 
 function fmt(n) { return Math.round(n).toLocaleString('es-CL'); }
 
 function updateMetrics() {
-  let inversion = 0, ganancia = 0, totalStock = 0, margenSum = 0, margenCount = 0;
+  let inversion = 0, gananciaReal = 0, totalStock = 0, margenSum = 0, margenCount = 0;
   products.forEach(p => {
-    const stock  = p.stock  || 0;
-    const costo  = p.costo  || 0;
-    const venta  = parseInt((p.price || '0').replace(/\./g,'')) || 0;
-    inversion  += costo * stock;
-    ganancia   += (venta - costo) * stock;
-    totalStock += stock;
+    const stock   = p.stock    || 0;
+    const costo   = p.costo    || 0;
+    const vendidos = p.vendidos || 0;
+    const venta   = parseInt((p.price || '0').replace(/\./g,'')) || 0;
+    inversion   += costo * stock;
+    gananciaReal += (venta - costo) * vendidos;
+    totalStock  += stock;
     if (venta > 0) { margenSum += ((venta - costo) / venta) * 100; margenCount++; }
   });
   const margen = margenCount > 0 ? margenSum / margenCount : 0;
-  document.getElementById('m-inversion').textContent = `$${fmt(inversion)}`;
-  document.getElementById('m-ganancia').textContent  = `$${fmt(ganancia)}`;
-  document.getElementById('m-margen').textContent    = `${Math.round(margen)}%`;
-  document.getElementById('m-stock').textContent     = totalStock;
+  document.getElementById('m-inversion').textContent    = `$${fmt(inversion)}`;
+  document.getElementById('m-ganancia-real').textContent = `$${fmt(gananciaReal)}`;
+  document.getElementById('m-margen').textContent       = `${Math.round(margen)}%`;
+  document.getElementById('m-stock').textContent        = totalStock;
   document.getElementById('m-stock').style.color = totalStock > 0 ? 'var(--good)' : 'var(--bad)';
+
+  const vendidosList = document.getElementById('m-vendidos-list');
+  vendidosList.innerHTML = products.map(p => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;">
+      <span style="color:var(--muted)">${p.name}</span>
+      <span style="font-weight:500;color:${(p.vendidos||0)>0?'var(--good)':'var(--text)'}">${p.vendidos||0} uds.</span>
+    </div>`).join('');
 }
 
 function addProduct() {
-  products.push({ id: nextId++, name:'Nuevo modelo', desc:'Descripción.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0 });
+  products.push({ id: nextId++, name:'Nuevo modelo', desc:'Descripción.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0, vendidos:0 });
   renderList(); updateMetrics(); markUnsaved();
 }
 
@@ -346,14 +358,19 @@ function removeProduct(id) {
 
 function changeStock(id, delta) {
   const p = products.find(p => p.id === id);
-  if (p) {
-    p.stock = Math.max(0, (p.stock || 0) + delta);
-    const val = document.getElementById(`sv-${id}`);
-    const badge = document.getElementById(`sb-${id}`);
-    if (val) val.textContent = p.stock;
-    if (badge) { badge.textContent = p.stock > 0 ? 'En stock' : 'Sin stock'; badge.className = `stock-badge ${p.stock > 0 ? 'ok' : 'out'}`; }
-    updateMetrics(); markUnsaved();
+  if (!p) return;
+  if (delta < 0) {
+    if ((p.stock || 0) <= 0) return;
+    p.stock = (p.stock || 0) - 1;
+    p.vendidos = (p.vendidos || 0) + 1;
+  } else {
+    p.stock = (p.stock || 0) + 1;
   }
+  const val = document.getElementById(`sv-${id}`);
+  const badge = document.getElementById(`sb-${id}`);
+  if (val) val.textContent = p.stock;
+  if (badge) { badge.textContent = p.stock > 0 ? 'En stock' : 'Sin stock'; badge.className = `stock-badge ${p.stock > 0 ? 'ok' : 'out'}`; }
+  updateMetrics(); markUnsaved();
 }
 
 function renderList() {
@@ -387,6 +404,10 @@ function renderList() {
         <div class="field">
           <label>Costo por unidad ($)</label>
           <input type="number" min="0" value="${p.costo??0}" oninput="updateField(${p.id},'costo',parseInt(this.value)||0)">
+        </div>
+        <div class="field">
+          <label>Stock disponible</label>
+          <input type="number" min="0" value="${stock}" oninput="updateField(${p.id},'stock',parseInt(this.value)||0);document.getElementById('sv-${p.id}').textContent=parseInt(this.value)||0">
         </div>
         <div class="field field-full">
           <label>Descripción</label>
