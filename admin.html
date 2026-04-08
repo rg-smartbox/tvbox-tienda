@@ -148,16 +148,16 @@
     <div class="logo">TV<span>Box</span>Pro <span style="font-size:12px;font-weight:400;color:var(--muted);margin-left:6px;">admin</span></div>
     <div class="nav-right">
       <span class="nav-badge">Panel privado</span>
-      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+      <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
     </div>
   </nav>
 
   <div class="tabs-wrap">
     <div class="tabs">
-      <button class="tab active" id="tab-btn-productos" onclick="switchTab('productos',this)">📦 Productos</button>
-      <button class="tab" id="tab-btn-usuarios" onclick="switchTab('usuarios',this)">👥 Usuarios</button>
-      <button class="tab" id="tab-btn-historial" onclick="switchTab('historial',this)">📋 Historial</button>
-      <button class="tab" id="tab-btn-config" onclick="switchTab('config',this)">⚙️ Configuración</button>
+      <button class="tab active" id="tab-btn-productos">📦 Productos</button>
+      <button class="tab" id="tab-btn-usuarios">👥 Usuarios</button>
+      <button class="tab" id="tab-btn-historial">📋 Historial</button>
+      <button class="tab" id="tab-btn-config">⚙️ Configuración</button>
     </div>
   </div>
 
@@ -206,7 +206,7 @@
               <input type="text" id="wa-cfg" placeholder="+56912345678" oninput="markUnsaved()">
             </div>
             <div class="prod-list" id="prod-list"></div>
-            <button class="btn-add-product" onclick="addProduct()">+ Agregar producto</button>
+            <button class="btn-add-product" id="btn-add-product">+ Agregar producto</button>
           </div>
 
         </div>
@@ -236,7 +236,7 @@
               </select>
             </div>
             <div style="display:flex;align-items:flex-end;">
-              <button onclick="crearUsuario()" style="width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;">+ Crear usuario</button>
+              <button id="btn-crear-usuario" style="width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;">+ Crear usuario</button>
             </div>
           </div>
           <div id="nu-msg" style="font-size:12px;margin-top:8px;"></div>
@@ -262,7 +262,7 @@
             <input type="text" id="new-user" placeholder="Nuevo usuario">
             <input type="password" id="new-pw" placeholder="Nueva contraseña">
             <input type="password" id="new-pw2" placeholder="Repetir contraseña">
-            <button class="btn-pw" onclick="changePassword()">Guardar</button>
+            <button class="btn-pw" id="btn-change-pw">Guardar</button>
           </div>
           <div class="pw-msg" id="pw-msg"></div>
         </div>
@@ -275,7 +275,7 @@
     <span class="save-status" id="save-status">Sin cambios pendientes</span>
     <div class="save-actions">
       <a href="index.html" target="_blank" class="btn-preview">Ver página →</a>
-      <button class="btn-save" onclick="saveAll()">Guardar cambios</button>
+      <button class="btn-save" id="btn-save-all">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -428,7 +428,10 @@ function addStock(id, cantidad) {
   if (cantidad <= 0) return;
   const p = products.find(p => p.id === id);
   if (!p) return;
-  p.stock = (p.stock || 0) + cantidad;
+  const stockActual = p.stock || 0;
+  const stockNuevo = stockActual + cantidad;
+  if (!confirm(`¿Confirmas agregar ${cantidad} unidad(es) a "${p.name}"?\n\nStock actual: ${stockActual} → Nuevo stock: ${stockNuevo}`)) return;
+  p.stock = stockNuevo;
   const badge = document.getElementById(`sb-${id}`);
   if (badge) { badge.textContent = p.stock > 0 ? `En stock · ${p.stock} uds.` : 'Sin stock'; badge.className = `stock-badge ${p.stock > 0 ? 'ok' : 'out'}`; }
   updateMetrics(); markUnsaved();
@@ -470,7 +473,7 @@ function renderList() {
         <div class="prod-card-name">${p.name}</div>
         <div class="prod-card-actions">
           <span class="stock-badge ${stock>0?'ok':'out'}" id="sb-${p.id}">${stock>0?'En stock · '+stock+' uds.':'Sin stock'}</span>
-          ${products.length > 1 ? '<button class="btn-del" onclick="removeProduct('+p.id+')">Eliminar</button>' : ''}
+          ${products.length > 1 ? '<button class="btn-del" data-action="remove-product" data-id="'+p.id+'">Eliminar</button>' : ''}
         </div>
       </div>
       <div class="fields-grid">
@@ -489,14 +492,11 @@ function renderList() {
         </div>
         <div class="field">
           <label>Agregar unidades al stock</label>
-          <div style="display:flex;gap:6px;">
+          <div style="display:flex;gap:6px;align-items:center;">
             <input type="number" min="0" value="0" id="add-stock-${p.id}" placeholder="0" style="flex:1;">
+            <span style="font-size:12px;color:var(--muted);">Stock actual: <strong style="color:var(--text);">${stock}</strong></span>
             <button data-action="add-stock" data-id="${p.id}" style="padding:0 14px;background:rgba(62,207,142,0.15);color:var(--good);border:1px solid rgba(62,207,142,0.3);border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">+ Agregar</button>
           </div>
-        </div>
-        <div class="field">
-          <label>Corrección de stock (editar directo)</label>
-          <input type="number" min="0" value="${stock}" data-action="fix-stock" data-id="${p.id}">
         </div>
         <div class="field field-full">
           <label>Descripción</label>
@@ -639,7 +639,7 @@ function renderUsuarios() {
               <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;${u.rol==='admin'?'background:rgba(79,142,247,0.1);color:var(--accent);border:1px solid rgba(79,142,247,0.2);':'background:rgba(62,207,142,0.1);color:var(--good);border:1px solid rgba(62,207,142,0.2);'}">${u.rol}</span>
             </td>
             <td style="padding:10px 10px;border-bottom:1px solid var(--border);text-align:right;">
-              <button onclick="eliminarUsuario('${u.user}')" style="font-size:12px;padding:4px 12px;background:rgba(255,102,102,0.08);color:var(--bad);border:1px solid rgba(255,102,102,0.2);border-radius:7px;cursor:pointer;">Eliminar</button>
+              <button data-action="eliminar-usuario" data-user="${u.user}" style="font-size:12px;padding:4px 12px;background:rgba(255,102,102,0.08);color:var(--bad);border:1px solid rgba(255,102,102,0.2);border-radius:7px;cursor:pointer;">Eliminar</button>
             </td>
           </tr>`).join('')}
       </tbody>
@@ -725,6 +725,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('login-btn').addEventListener('click', doLogin);
   document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('pw-input').focus(); });
   document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  document.getElementById('btn-logout').addEventListener('click', logout);
+  document.getElementById('btn-add-product').addEventListener('click', addProduct);
+  document.getElementById('btn-crear-usuario').addEventListener('click', crearUsuario);
+  document.getElementById('btn-change-pw').addEventListener('click', changePassword);
+  document.getElementById('btn-save-all').addEventListener('click', saveAll);
+  document.getElementById('tab-btn-productos').addEventListener('click', function(){ switchTab('productos', this); });
+  document.getElementById('tab-btn-usuarios').addEventListener('click', function(){ switchTab('usuarios', this); });
+  document.getElementById('tab-btn-historial').addEventListener('click', function(){ switchTab('historial', this); });
+  document.getElementById('tab-btn-config').addEventListener('click', function(){ switchTab('config', this); });
 
   if (sessionStorage.getItem('tvbox_admin_logged')) {
     document.getElementById('login-screen').style.display = 'none';
@@ -743,22 +752,15 @@ document.addEventListener('click', e => {
     addStock(id, val);
     document.getElementById(`add-stock-${id}`).value = 0;
   }
+  if (action === 'remove-product') {
+    removeProduct(id);
+  }
+  if (action === 'eliminar-usuario') {
+    eliminarUsuario(btn.dataset.user);
+  }
   if (action === 'anular') {
     anularVenta(parseInt(btn.dataset.index));
   }
-});
-
-document.addEventListener('change', e => {
-  const inp = e.target.closest('[data-action="fix-stock"]');
-  if (!inp) return;
-  const id = parseInt(inp.dataset.id);
-  const val = parseInt(inp.value) || 0;
-  const p = products.find(p => p.id === id);
-  if (!p) return;
-  p.stock = val;
-  const badge = document.getElementById(`sb-${id}`);
-  if (badge) { badge.textContent = val > 0 ? `En stock · ${val} uds.` : 'Sin stock'; badge.className = `stock-badge ${val > 0 ? 'ok' : 'out'}`; }
-  updateMetrics(); markUnsaved();
 });
 
 window.addEventListener('beforeunload', e => { if (unsaved) { e.preventDefault(); e.returnValue=''; } });
