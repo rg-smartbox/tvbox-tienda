@@ -91,6 +91,17 @@
   .hist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .hist-table th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; }
   .hist-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:2rem; }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; width:100%; max-width:420px; }
+  .modal-msg { font-size:15px; color:var(--text); margin-bottom:1.25rem; line-height:1.5; white-space:pre-line; }
+  .modal-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:14px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; margin-bottom:1rem; }
+  .modal-btns { display:flex; gap:10px; justify-content:flex-end; }
+  .modal-btn-cancel { font-size:14px; padding:9px 20px; background:none; color:var(--muted); border:1px solid var(--border); border-radius:8px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .modal-btn-ok { font-size:14px; font-weight:500; padding:9px 20px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .modal-btn-ok.danger { background:var(--bad); }
 </style>
 </head>
 <body>
@@ -201,6 +212,18 @@
   </div>
 </div>
 
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-msg" id="modal-msg"></div>
+    <input type="text" class="modal-input" id="modal-input" style="display:none;">
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" id="modal-cancel">Cancelar</button>
+      <button class="modal-btn-ok" id="modal-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -217,6 +240,39 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const DEFAULT_PASS = 'admin123';
+
+// MODAL HELPER
+function modalConfirm(msg, danger=false) {
+  return new Promise(resolve => {
+    document.getElementById('modal-msg').textContent = msg;
+    document.getElementById('modal-input').style.display = 'none';
+    document.getElementById('modal-ok').className = 'modal-btn-ok' + (danger?' danger':'');
+    document.getElementById('modal-ok').textContent = 'Confirmar';
+    document.getElementById('modal-overlay').classList.add('open');
+    const ok = document.getElementById('modal-ok');
+    const cancel = document.getElementById('modal-cancel');
+    const cleanup = () => { document.getElementById('modal-overlay').classList.remove('open'); ok.onclick=null; cancel.onclick=null; };
+    ok.onclick = () => { cleanup(); resolve(true); };
+    cancel.onclick = () => { cleanup(); resolve(false); };
+  });
+}
+function modalPrompt(msg) {
+  return new Promise(resolve => {
+    document.getElementById('modal-msg').textContent = msg;
+    const inp = document.getElementById('modal-input');
+    inp.style.display = 'block'; inp.value = '';
+    document.getElementById('modal-ok').className = 'modal-btn-ok';
+    document.getElementById('modal-ok').textContent = 'Aceptar';
+    document.getElementById('modal-overlay').classList.add('open');
+    inp.focus();
+    const ok = document.getElementById('modal-ok');
+    const cancel = document.getElementById('modal-cancel');
+    const cleanup = () => { document.getElementById('modal-overlay').classList.remove('open'); ok.onclick=null; cancel.onclick=null; inp.onkeydown=null; };
+    ok.onclick = () => { const v=inp.value.trim(); cleanup(); resolve(v); };
+    cancel.onclick = () => { cleanup(); resolve(null); };
+    inp.onkeydown = e => { if(e.key==='Enter') ok.click(); if(e.key==='Escape') cancel.click(); };
+  });
+}
 const TAG_OPTS = [
   { key:'amber', label:'Para empezar' },
   { key:'blue',  label:'Más vendido'  },
@@ -258,7 +314,7 @@ async function doLogin() {
 }
 
 function logout() {
-  if (unsaved && !confirm('Tienes cambios sin guardar. ¿Cerrar sesión?')) return;
+  if (unsaved && !await modalConfirm('Tienes cambios sin guardar. ¿Cerrar sesión?')) return;
   sessionStorage.removeItem('tvbox_admin_logged');
   localStorage.removeItem('tvbox_backup');
   document.getElementById('admin-screen').style.display = 'none';
@@ -276,7 +332,7 @@ async function loadData() {
     ]);
     const backup = localStorage.getItem('tvbox_backup');
     if (backup) {
-      if (confirm('Hay cambios no guardados de una sesión anterior. ¿Recuperarlos?')) {
+      if (await modalConfirm('Hay cambios no guardados de una sesión anterior. ¿Recuperarlos?')) {
         products = JSON.parse(backup); markUnsaved();
       } else {
         products = psnap.exists ? (psnap.data().lista || []) : getDefaultProducts();
@@ -327,7 +383,7 @@ function addProduct() {
 
 function removeProduct(id) {
   if (products.length<=1) return alert('Debe haber al menos un producto.');
-  if (!confirm('¿Eliminar este producto?')) return;
+  if (!await modalConfirm('¿Eliminar este producto?', true)) return;
   products = products.filter(p=>p.id!==id);
   renderList(); updateMetrics(); markUnsaved();
 }
@@ -338,7 +394,7 @@ function addStock(id) {
   const val = parseInt(document.getElementById('add-stock-'+id).value)||0;
   if (val<=0) return;
   const nuevo = (p.stock||0)+val;
-  if (!confirm('¿Agregar '+val+' unidad(es) a "'+p.name+'"?\n\nStock actual: '+(p.stock||0)+' → Nuevo: '+nuevo)) return;
+  if (!await modalConfirm('¿Agregar '+val+' unidad(es) a "'+p.name+'"?\n\nStock actual: '+(p.stock||0)+' → Nuevo: '+nuevo)) return;
   p.stock = nuevo;
   document.getElementById('sb-'+id).textContent = p.stock>0 ? 'En stock · '+p.stock+' uds.' : 'Sin stock';
   document.getElementById('sb-'+id).className = 'stock-badge '+(p.stock>0?'ok':'out');
@@ -441,7 +497,7 @@ async function crearUsuario() {
 }
 
 async function eliminarUsuario(user) {
-  if(!confirm('¿Eliminar usuario "'+user+'"?'))return;
+  if(!await modalConfirm('¿Eliminar usuario "'+user+'"?', true))return;
   usuarios=usuarios.filter(u=>u.user!==user);
   await db.doc('tienda/usuarios').set({lista:usuarios});
   renderUsuarios();
@@ -488,7 +544,7 @@ function renderHistorial() {
 }
 
 async function anularVenta(index) {
-  const obs=prompt('Motivo de anulación:');
+  const obs=await modalPrompt('Motivo de anulación:');
   if(obs===null)return;
   const v=ventas[index];
   if(!v||v.anulada)return;
