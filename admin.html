@@ -14,6 +14,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; min-height: 100vh; }
 
+  /* LOGIN */
   #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
   .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 2.5rem 2rem; width: 100%; max-width: 360px; text-align: center; }
   .login-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; margin-bottom: 0.25rem; }
@@ -26,6 +27,7 @@
   .login-btn:hover { opacity: 0.85; }
   .login-error { font-size: 13px; color: var(--bad); margin-top: 10px; display: none; }
 
+  /* ADMIN */
   #admin-screen { display: none; }
   nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; }
   .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; }
@@ -35,18 +37,37 @@
   .btn-logout { font-size: 13px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 4px 8px; }
 
   /* TABS */
-  .tabs { display: flex; gap: 4px; padding: 1rem 2rem 0; max-width: 820px; margin: 0 auto; }
+  .tabs-wrap { padding: 1.5rem 2rem 0; max-width: 1200px; margin: 0 auto; }
+  .tabs { display: flex; gap: 4px; }
   .tab { font-size: 14px; font-weight: 500; padding: 9px 20px; border-radius: 9px 9px 0 0; border: 1px solid var(--border); border-bottom: none; cursor: pointer; color: var(--muted); background: var(--surface2); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .tab.active { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .tab.active { background: var(--surface); color: var(--text); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  main { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 0 9px 9px 9px; margin-left: auto; margin-right: auto; }
+  /* MAIN AREA */
+  .admin-body { max-width: 1200px; margin: 0 auto; padding: 0 2rem 6rem; }
+  .admin-inner { background: var(--surface); border: 1px solid var(--border); border-radius: 0 9px 9px 9px; padding: 1.5rem; }
 
+  /* PRODUCTOS LAYOUT: sidebar + content */
+  .productos-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; align-items: start; }
+  @media(max-width: 700px) { .productos-layout { grid-template-columns: 1fr; } }
+
+  /* SIDEBAR MÉTRICAS */
+  .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 80px; }
+  .metric-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+  .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .metric-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+  .metric-val.green { color: var(--good); }
+  .metric-val.amber { color: var(--amber); }
+  .metric-val.blue { color: var(--accent); }
+  .metric-val.red { color: var(--bad); }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .sidebar-title { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+
+  /* PRODUCTS */
   .section-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 0.25rem; }
-  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
-
-  .config-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
+  .config-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .config-box label { font-size: 13px; color: var(--muted); white-space: nowrap; }
   .config-box input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; flex: 1; min-width: 160px; outline: none; }
 
@@ -54,22 +75,26 @@
   .prod-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
   .prod-card.is-featured { border-color: rgba(79,142,247,0.35); }
   .prod-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
-  .prod-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
-  .prod-card-actions { display: flex; gap: 8px; align-items: center; }
-  .btn-del { font-size: 12px; padding: 5px 14px; background: rgba(255,102,102,0.08); color: var(--bad); border: 1px solid rgba(255,102,102,0.2); border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .prod-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .prod-card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-del { font-size: 12px; padding: 5px 12px; background: rgba(255,102,102,0.08); color: var(--bad); border: 1px solid rgba(255,102,102,0.2); border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .btn-del:hover { background: rgba(255,102,102,0.15); }
-  .stock-ctrl { display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; }
-  .stock-btn { width: 26px; height: 26px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; line-height: 1; }
+
+  .stock-ctrl { display: flex; align-items: center; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px 7px; }
+  .stock-btn { width: 24px; height: 24px; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; line-height: 1; }
   .stock-btn.minus { background: rgba(255,102,102,0.15); color: var(--bad); }
   .stock-btn.minus:hover { background: rgba(255,102,102,0.3); }
   .stock-btn.plus { background: rgba(62,207,142,0.15); color: var(--good); }
   .stock-btn.plus:hover { background: rgba(62,207,142,0.3); }
-  .stock-val { font-size: 14px; font-weight: 500; min-width: 28px; text-align: center; color: var(--text); }
+  .stock-val { font-size: 14px; font-weight: 500; min-width: 26px; text-align: center; }
+  .stock-badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 20px; }
+  .stock-badge.ok { background: rgba(62,207,142,0.1); color: var(--good); border: 1px solid rgba(62,207,142,0.2); }
+  .stock-badge.out { background: rgba(255,102,102,0.1); color: var(--bad); border: 1px solid rgba(255,102,102,0.2); }
 
   .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   @media(max-width:500px){ .fields-grid { grid-template-columns: 1fr; } }
   .field-full { grid-column: 1 / -1; }
-  .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.3px; }
+  .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
   .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; }
   .field input:focus, .field select:focus { border-color: rgba(79,142,247,0.4); }
   .field select option { background: #1c1c26; }
@@ -80,35 +105,8 @@
   .btn-add-product { width: 100%; background: none; border: 1px dashed rgba(79,142,247,0.3); border-radius: 12px; padding: 13px; color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: background 0.15s; }
   .btn-add-product:hover { background: rgba(79,142,247,0.05); }
 
-  /* FINANZAS */
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
-  .metric { background: var(--surface2); border-radius: 12px; padding: 1rem; }
-  .metric-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .metric-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
-  .metric-val.green { color: var(--good); }
-  .metric-val.amber { color: var(--amber); }
-  .metric-val.blue { color: var(--accent); }
-  .metric-val.red { color: var(--bad); }
-
-  .fin-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1.5rem; }
-  .fin-table th { text-align: left; font-size: 11px; color: var(--muted); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--border); letter-spacing: 0.5px; text-transform: uppercase; }
-  .fin-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
-  .fin-table tr:last-child td { border-bottom: none; }
-  .badge-ingreso { font-size: 11px; background: rgba(62,207,142,0.1); color: var(--good); border: 1px solid rgba(62,207,142,0.2); padding: 2px 8px; border-radius: 20px; }
-  .badge-egreso { font-size: 11px; background: rgba(255,102,102,0.1); color: var(--bad); border: 1px solid rgba(255,102,102,0.2); padding: 2px 8px; border-radius: 20px; }
-
-  .add-mov { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; }
-  .add-mov-title { font-size: 14px; font-weight: 500; margin-bottom: 1rem; color: var(--text); }
-  .mov-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media(max-width:500px){ .mov-form { grid-template-columns: 1fr; } }
-  .mov-form input, .mov-form select { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; width: 100%; }
-  .mov-form input:focus, .mov-form select:focus { border-color: rgba(79,142,247,0.4); }
-  .btn-add-mov { grid-column: 1 / -1; background: var(--accent); color: white; border: none; border-radius: 9px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
-  .btn-add-mov:hover { opacity: 0.85; }
-  .btn-del-mov { background: none; border: none; color: var(--bad); cursor: pointer; font-size: 16px; padding: 2px 6px; }
-
-  /* CREDENCIALES */
-  .change-pw { margin-top: 1.5rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-bottom: 2rem; }
+  /* CONFIG */
+  .change-pw { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-bottom: 2rem; }
   .change-pw-title { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: var(--muted); }
   .pw-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .pw-row input { flex: 1; min-width: 140px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; }
@@ -118,7 +116,7 @@
   .pw-msg.err { color: var(--bad); }
 
   /* SAVE BAR */
-  .save-bar { position: sticky; bottom: 0; background: rgba(10,10,15,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .save-bar { position: sticky; bottom: 0; background: rgba(10,10,15,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; z-index: 50; }
   .save-status { font-size: 13px; color: var(--muted); }
   .save-status.saved { color: var(--good); }
   .save-actions { display: flex; gap: 10px; }
@@ -126,12 +124,11 @@
   .btn-preview:hover { color: var(--text); }
   .btn-save { font-size: 14px; font-weight: 500; padding: 10px 24px; background: var(--accent); color: white; border: none; border-radius: 9px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .btn-save:hover { opacity: 0.85; }
-
-  .empty-state { text-align: center; padding: 2rem; color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">TV<span>Box</span>Pro</div>
@@ -145,6 +142,7 @@
   </div>
 </div>
 
+<!-- ADMIN -->
 <div id="admin-screen">
   <nav>
     <div class="logo">TV<span>Box</span>Pro <span style="font-size:12px;font-weight:400;color:var(--muted);margin-left:6px;">admin</span></div>
@@ -154,68 +152,64 @@
     </div>
   </nav>
 
-  <div style="max-width:820px;margin:0 auto;padding:1.5rem 2rem 0;">
+  <div class="tabs-wrap">
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('productos')">📦 Productos</button>
-      <button class="tab" onclick="switchTab('finanzas')">💰 Finanzas</button>
-      <button class="tab" onclick="switchTab('config')">⚙️ Configuración</button>
+      <button class="tab active" id="tab-btn-productos" onclick="switchTab('productos',this)">📦 Productos</button>
+      <button class="tab" id="tab-btn-config" onclick="switchTab('config',this)">⚙️ Configuración</button>
     </div>
   </div>
 
-  <div style="max-width:820px;margin:0 auto;padding:0 2rem 6rem;">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:0 9px 9px 9px;padding:1.5rem;">
+  <div class="admin-body">
+    <div class="admin-inner">
 
       <!-- TAB PRODUCTOS -->
       <div class="tab-content active" id="tab-productos">
-        <div class="section-title">Productos</div>
-        <div class="section-sub">Gestiona tu catálogo y controla el stock.</div>
-        <div class="config-box">
-          <label>WhatsApp de contacto</label>
-          <input type="text" id="wa-cfg" placeholder="+56912345678" oninput="markUnsaved()">
-        </div>
-        <div class="prod-list" id="prod-list"></div>
-        <button class="btn-add-product" onclick="addProduct()">+ Agregar producto</button>
-      </div>
+        <div class="productos-layout">
 
-      <!-- TAB FINANZAS -->
-      <div class="tab-content" id="tab-finanzas">
-        <div class="section-title">Finanzas</div>
-        <div class="section-sub">Resumen de ingresos, egresos y ganancia neta.</div>
-
-        <div class="metrics" id="metrics-grid"></div>
-
-        <div class="add-mov">
-          <div class="add-mov-title">Registrar movimiento</div>
-          <div class="mov-form">
-            <select id="mov-tipo">
-              <option value="ingreso">Ingreso (venta)</option>
-              <option value="egreso">Egreso (compra / gasto)</option>
-            </select>
-            <input type="text" id="mov-desc" placeholder="Descripción (ej: Venta TV Box Pro)">
-            <input type="number" id="mov-monto" placeholder="Monto ($)" min="0">
-            <input type="date" id="mov-fecha">
-            <button class="btn-add-mov" onclick="addMovimiento()">+ Agregar</button>
+          <!-- SIDEBAR -->
+          <div class="sidebar" id="sidebar">
+            <div class="sidebar-title">Resumen</div>
+            <div class="metric-card">
+              <div class="metric-label">Inversión total</div>
+              <div class="metric-val amber" id="m-inversion">$0</div>
+              <div class="metric-sub">costo × stock</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Ganancia potencial</div>
+              <div class="metric-val green" id="m-ganancia">$0</div>
+              <div class="metric-sub">si vendes todo</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Margen promedio</div>
+              <div class="metric-val blue" id="m-margen">0%</div>
+              <div class="metric-sub">por unidad</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Unidades en stock</div>
+              <div class="metric-val" id="m-stock" style="color:var(--text)">0</div>
+              <div class="metric-sub">total disponibles</div>
+            </div>
           </div>
-        </div>
 
-        <table class="fin-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Descripción</th>
-              <th>Tipo</th>
-              <th>Monto</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="mov-tbody"></tbody>
-        </table>
+          <!-- PRODUCTOS -->
+          <div>
+            <div class="section-title">Productos</div>
+            <div class="section-sub">Gestiona tu catálogo y stock.</div>
+            <div class="config-box">
+              <label>WhatsApp de contacto</label>
+              <input type="text" id="wa-cfg" placeholder="+56912345678" oninput="markUnsaved()">
+            </div>
+            <div class="prod-list" id="prod-list"></div>
+            <button class="btn-add-product" onclick="addProduct()">+ Agregar producto</button>
+          </div>
+
+        </div>
       </div>
 
       <!-- TAB CONFIG -->
       <div class="tab-content" id="tab-config">
         <div class="section-title">Configuración</div>
-        <div class="section-sub">Credenciales de acceso al panel.</div>
+        <div class="section-sub" style="margin-bottom:1.5rem;">Credenciales de acceso al panel.</div>
         <div class="change-pw">
           <div class="change-pw-title">Cambiar usuario y contraseña</div>
           <div class="pw-row">
@@ -255,7 +249,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const DEFAULT_PASS = 'admin123';
 const TAG_OPTS = [
   { key:'amber', label:'Para empezar' },
@@ -264,16 +257,14 @@ const TAG_OPTS = [
 ];
 
 let products = [];
-let movimientos = [];
 let nextId = 10;
 let unsaved = false;
 
-function switchTab(name) {
+function switchTab(name, el) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
-  if (name === 'finanzas') renderFinanzas();
+  el.classList.add('active');
 }
 
 async function getCredentials() {
@@ -305,41 +296,63 @@ function logout() {
 async function loadData() {
   const psnap = await getDoc(doc(db, 'tienda', 'productos'));
   const csnap = await getDoc(doc(db, 'tienda', 'config'));
-  const msnap = await getDoc(doc(db, 'tienda', 'movimientos'));
   products = psnap.exists() ? (psnap.data().lista || []) : getDefaultProducts();
   const waVal = csnap.exists() ? (csnap.data().wa || '+56912345678') : '+56912345678';
-  movimientos = msnap.exists() ? (msnap.data().lista || []) : [];
   document.getElementById('wa-cfg').value = waVal;
-  document.getElementById('mov-fecha').value = new Date().toISOString().split('T')[0];
   nextId = products.reduce((m,p) => Math.max(m, p.id), 0) + 1;
   renderList();
+  updateMetrics();
 }
 
 function getDefaultProducts() {
   return [
-    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series.',          price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0 },
-    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen.',           price:'XX.XXX', tag:'blue',  featured:true,  photos:[], video:'', stock:0, costo:0 },
-    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible.',       price:'XX.XXX', tag:'green', featured:false, photos:[], video:'', stock:0, costo:0 },
+    { id:1, name:'TV Box Básico',  desc:'YouTube, Netflix, series. Optimizado para que todo abra rápido y sin trabas.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0 },
+    { id:2, name:'TV Box Pro',     desc:'Más fluido, mejor imagen. El favorito de nuestros clientes.',                  price:'XX.XXX', tag:'blue',  featured:true,  photos:[], video:'', stock:0, costo:0 },
+    { id:3, name:'TV Box Ultra',   desc:'La mejor experiencia posible. Para el que no quiere compromisos.',             price:'XX.XXX', tag:'green', featured:false, photos:[], video:'', stock:0, costo:0 },
   ];
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('es-CL'); }
+
+function updateMetrics() {
+  let inversion = 0, ganancia = 0, totalStock = 0, margenSum = 0, margenCount = 0;
+  products.forEach(p => {
+    const stock  = p.stock  || 0;
+    const costo  = p.costo  || 0;
+    const venta  = parseInt((p.price || '0').replace(/\./g,'')) || 0;
+    inversion  += costo * stock;
+    ganancia   += (venta - costo) * stock;
+    totalStock += stock;
+    if (venta > 0) { margenSum += ((venta - costo) / venta) * 100; margenCount++; }
+  });
+  const margen = margenCount > 0 ? margenSum / margenCount : 0;
+  document.getElementById('m-inversion').textContent = `$${fmt(inversion)}`;
+  document.getElementById('m-ganancia').textContent  = `$${fmt(ganancia)}`;
+  document.getElementById('m-margen').textContent    = `${Math.round(margen)}%`;
+  document.getElementById('m-stock').textContent     = totalStock;
+  document.getElementById('m-stock').style.color = totalStock > 0 ? 'var(--good)' : 'var(--bad)';
 }
 
 function addProduct() {
   products.push({ id: nextId++, name:'Nuevo modelo', desc:'Descripción.', price:'XX.XXX', tag:'amber', featured:false, photos:[], video:'', stock:0, costo:0 });
-  renderList(); markUnsaved();
+  renderList(); updateMetrics(); markUnsaved();
 }
 
 function removeProduct(id) {
   if (products.length <= 1) return alert('Debe haber al menos un producto.');
   products = products.filter(p => p.id !== id);
-  renderList(); markUnsaved();
+  renderList(); updateMetrics(); markUnsaved();
 }
 
 function changeStock(id, delta) {
   const p = products.find(p => p.id === id);
   if (p) {
     p.stock = Math.max(0, (p.stock || 0) + delta);
-    document.getElementById(`stock-val-${id}`).textContent = p.stock;
-    markUnsaved();
+    const val = document.getElementById(`sv-${id}`);
+    const badge = document.getElementById(`sb-${id}`);
+    if (val) val.textContent = p.stock;
+    if (badge) { badge.textContent = p.stock > 0 ? 'En stock' : 'Sin stock'; badge.className = `stock-badge ${p.stock > 0 ? 'ok' : 'out'}`; }
+    updateMetrics(); markUnsaved();
   }
 }
 
@@ -348,18 +361,17 @@ function renderList() {
   list.innerHTML = products.map(p => {
     const photos = p.photos || ['','',''];
     const stock = p.stock ?? 0;
-    const stockColor = stock > 0 ? 'var(--good)' : 'var(--bad)';
     return `
-    <div class="prod-card ${p.featured ? 'is-featured' : ''}" id="card-${p.id}">
+    <div class="prod-card ${p.featured?'is-featured':''}" id="card-${p.id}">
       <div class="prod-card-top">
         <div class="prod-card-name">${p.name}</div>
         <div class="prod-card-actions">
           <div class="stock-ctrl">
             <button class="stock-btn minus" onclick="changeStock(${p.id},-1)">−</button>
-            <span class="stock-val" id="stock-val-${p.id}" style="color:${stockColor}">${stock}</span>
+            <span class="stock-val" id="sv-${p.id}">${stock}</span>
             <button class="stock-btn plus" onclick="changeStock(${p.id},1)">+</button>
           </div>
-          <span style="font-size:11px;color:${stockColor};font-weight:500;">${stock > 0 ? 'En stock' : 'Sin stock'}</span>
+          <span class="stock-badge ${stock>0?'ok':'out'}" id="sb-${p.id}">${stock>0?'En stock':'Sin stock'}</span>
           ${products.length > 1 ? `<button class="btn-del" onclick="removeProduct(${p.id})">Eliminar</button>` : ''}
         </div>
       </div>
@@ -374,11 +386,11 @@ function renderList() {
         </div>
         <div class="field">
           <label>Costo por unidad ($)</label>
-          <input type="number" min="0" value="${p.costo ?? 0}" oninput="updateField(${p.id},'costo',parseInt(this.value)||0)">
+          <input type="number" min="0" value="${p.costo??0}" oninput="updateField(${p.id},'costo',parseInt(this.value)||0)">
         </div>
         <div class="field">
-          <label>Stock inicial</label>
-          <input type="number" min="0" value="${stock}" oninput="updateField(${p.id},'stock',parseInt(this.value)||0);document.getElementById('stock-val-${p.id}').textContent=this.value">
+          <label>Stock</label>
+          <input type="number" min="0" value="${stock}" oninput="updateField(${p.id},'stock',parseInt(this.value)||0);document.getElementById('sv-${p.id}').textContent=this.value||0">
         </div>
         <div class="field field-full">
           <label>Descripción</label>
@@ -387,7 +399,7 @@ function renderList() {
         <div class="field">
           <label>Etiqueta</label>
           <select onchange="updateField(${p.id},'tag',this.value)">
-            ${TAG_OPTS.map(t => `<option value="${t.key}" ${p.tag===t.key?'selected':''}>${t.label}</option>`).join('')}
+            ${TAG_OPTS.map(t=>`<option value="${t.key}" ${p.tag===t.key?'selected':''}>${t.label}</option>`).join('')}
           </select>
         </div>
         <div class="field" style="display:flex;align-items:flex-end;">
@@ -398,10 +410,10 @@ function renderList() {
         </div>
         <div class="field field-full" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:4px;">
           <label style="font-size:12px;color:var(--accent);margin-bottom:8px;display:block;">Fotos (links de Cloudinary)</label>
-          ${[0,1,2].map(i => `
+          ${[0,1,2].map(i=>`
             <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
               <input type="text" placeholder="https://res.cloudinary.com/..." value="${photos[i]||''}" oninput="updatePhoto(${p.id},${i},this.value)" style="flex:1;font-size:12px;">
-              ${photos[i] ? `<img src="${photos[i]}" style="width:36px;height:36px;object-fit:cover;border-radius:5px;flex-shrink:0;">` : ''}
+              ${photos[i]?`<img src="${photos[i]}" style="width:36px;height:36px;object-fit:cover;border-radius:5px;flex-shrink:0;">`:''}
             </div>`).join('')}
         </div>
         <div class="field field-full">
@@ -418,67 +430,14 @@ function updateField(id, field, value) {
     p[field] = value;
     const card = document.getElementById(`card-${id}`);
     if (field === 'name') card.querySelector('.prod-card-name').textContent = value;
-    if (field === 'featured') card.className = `prod-card ${value ? 'is-featured' : ''}`;
-    markUnsaved();
+    if (field === 'featured') card.className = `prod-card ${value?'is-featured':''}`;
+    updateMetrics(); markUnsaved();
   }
 }
 
 function updatePhoto(id, index, value) {
   const p = products.find(p => p.id === id);
-  if (p) { if (!p.photos) p.photos = ['','','']; p.photos[index] = value; markUnsaved(); }
-}
-
-function fmt(n) { return Number(n).toLocaleString('es-CL'); }
-
-function renderFinanzas() {
-  const totalIngresos = movimientos.filter(m => m.tipo === 'ingreso').reduce((s,m) => s + (m.monto||0), 0);
-  const totalEgresos  = movimientos.filter(m => m.tipo === 'egreso').reduce((s,m) => s + (m.monto||0), 0);
-  const ganancia = totalIngresos - totalEgresos;
-  const inversionStock = products.reduce((s,p) => s + ((p.costo||0) * (p.stock||0)), 0);
-
-  document.getElementById('metrics-grid').innerHTML = `
-    <div class="metric"><div class="metric-label">Total ingresos</div><div class="metric-val green">$${fmt(totalIngresos)}</div></div>
-    <div class="metric"><div class="metric-label">Total egresos</div><div class="metric-val red">$${fmt(totalEgresos)}</div></div>
-    <div class="metric"><div class="metric-label">Ganancia neta</div><div class="metric-val ${ganancia>=0?'green':'red'}">$${fmt(ganancia)}</div></div>
-    <div class="metric"><div class="metric-label">Inversión en stock</div><div class="metric-val amber">$${fmt(inversionStock)}</div></div>
-  `;
-
-  const tbody = document.getElementById('mov-tbody');
-  if (!movimientos.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin movimientos registrados</td></tr>';
-    return;
-  }
-  tbody.innerHTML = [...movimientos].reverse().map((m,i) => `
-    <tr>
-      <td>${m.fecha || '—'}</td>
-      <td>${m.desc}</td>
-      <td><span class="badge-${m.tipo}">${m.tipo}</span></td>
-      <td style="font-weight:500;color:${m.tipo==='ingreso'?'var(--good)':'var(--bad)'}">$${fmt(m.monto)}</td>
-      <td><button class="btn-del-mov" onclick="deleteMovimiento(${movimientos.length-1-i})">✕</button></td>
-    </tr>`).join('');
-}
-
-function addMovimiento() {
-  const tipo  = document.getElementById('mov-tipo').value;
-  const desc  = document.getElementById('mov-desc').value.trim();
-  const monto = parseInt(document.getElementById('mov-monto').value) || 0;
-  const fecha = document.getElementById('mov-fecha').value;
-  if (!desc || !monto) return alert('Completa descripción y monto.');
-  movimientos.push({ tipo, desc, monto, fecha });
-  document.getElementById('mov-desc').value = '';
-  document.getElementById('mov-monto').value = '';
-  renderFinanzas();
-  saveMovimientos();
-}
-
-function deleteMovimiento(index) {
-  movimientos.splice(index, 1);
-  renderFinanzas();
-  saveMovimientos();
-}
-
-async function saveMovimientos() {
-  await setDoc(doc(db, 'tienda', 'movimientos'), { lista: movimientos });
+  if (p) { if (!p.photos) p.photos=['','','']; p.photos[index]=value; markUnsaved(); }
 }
 
 function markUnsaved() {
@@ -490,13 +449,13 @@ function markUnsaved() {
 
 async function saveAll() {
   const wa = document.getElementById('wa-cfg').value;
-  await setDoc(doc(db, 'tienda', 'productos'), { lista: products });
-  await setDoc(doc(db, 'tienda', 'config'), { wa });
+  await setDoc(doc(db,'tienda','productos'), { lista: products });
+  await setDoc(doc(db,'tienda','config'), { wa });
   unsaved = false;
   const s = document.getElementById('save-status');
   s.textContent = '¡Guardado! Los cambios ya se ven en la página.';
   s.className = 'save-status saved';
-  setTimeout(() => { s.textContent = 'Sin cambios pendientes'; s.className = 'save-status'; }, 3000);
+  setTimeout(() => { s.textContent='Sin cambios pendientes'; s.className='save-status'; }, 3000);
 }
 
 async function changePassword() {
@@ -505,31 +464,22 @@ async function changePassword() {
   const p2 = document.getElementById('new-pw2').value;
   const msg = document.getElementById('pw-msg');
   if (!newUser) { msg.className='pw-msg err'; msg.textContent='El usuario no puede estar vacío.'; return; }
-  if (!p1 || p1.length < 4) { msg.className='pw-msg err'; msg.textContent='Mínimo 4 caracteres.'; return; }
-  if (p1 !== p2) { msg.className='pw-msg err'; msg.textContent='Las contraseñas no coinciden.'; return; }
-  await setDoc(doc(db, 'tienda', 'admin'), { user: newUser, pass: p1 });
-  document.getElementById('new-user').value = '';
-  document.getElementById('new-pw').value = '';
-  document.getElementById('new-pw2').value = '';
-  msg.className = 'pw-msg ok';
-  msg.textContent = 'Credenciales actualizadas.';
-  setTimeout(() => { msg.textContent = ''; }, 3000);
+  if (!p1||p1.length<4) { msg.className='pw-msg err'; msg.textContent='Mínimo 4 caracteres.'; return; }
+  if (p1!==p2) { msg.className='pw-msg err'; msg.textContent='Las contraseñas no coinciden.'; return; }
+  await setDoc(doc(db,'tienda','admin'), { user: newUser, pass: p1 });
+  document.getElementById('new-user').value='';
+  document.getElementById('new-pw').value='';
+  document.getElementById('new-pw2').value='';
+  msg.className='pw-msg ok'; msg.textContent='Credenciales actualizadas.';
+  setTimeout(() => { msg.textContent=''; }, 3000);
 }
 
-window.doLogin = doLogin;
-window.logout = logout;
-window.switchTab = switchTab;
-window.addProduct = addProduct;
-window.removeProduct = removeProduct;
-window.changeStock = changeStock;
-window.updateField = updateField;
-window.updatePhoto = updatePhoto;
-window.addMovimiento = addMovimiento;
-window.deleteMovimiento = deleteMovimiento;
-window.saveAll = saveAll;
-window.changePassword = changePassword;
+window.doLogin=doLogin; window.logout=logout; window.switchTab=switchTab;
+window.addProduct=addProduct; window.removeProduct=removeProduct; window.changeStock=changeStock;
+window.updateField=updateField; window.updatePhoto=updatePhoto;
+window.saveAll=saveAll; window.changePassword=changePassword;
 
-window.addEventListener('beforeunload', e => { if (unsaved) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('beforeunload', e => { if (unsaved) { e.preventDefault(); e.returnValue=''; } });
 </script>
 </body>
 </html>
