@@ -155,6 +155,8 @@
   <div class="tabs-wrap">
     <div class="tabs">
       <button class="tab active" id="tab-btn-productos" onclick="switchTab('productos',this)">📦 Productos</button>
+      <button class="tab" id="tab-btn-usuarios" onclick="switchTab('usuarios',this)">👥 Usuarios</button>
+      <button class="tab" id="tab-btn-historial" onclick="switchTab('historial',this)">📋 Historial</button>
       <button class="tab" id="tab-btn-config" onclick="switchTab('config',this)">⚙️ Configuración</button>
     </div>
   </div>
@@ -189,7 +191,7 @@
               <div class="metric-val" id="m-stock" style="color:var(--text)">0</div>
               <div class="metric-sub">total disponibles</div>
             </div>
-            <div class="metric-card" id="m-vendidos-card">
+            <div class="metric-card">
               <div class="metric-label">Vendidos por producto</div>
               <div id="m-vendidos-list" style="margin-top:6px;"></div>
             </div>
@@ -210,10 +212,50 @@
         </div>
       </div>
 
+      <!-- TAB USUARIOS -->
+      <div class="tab-content" id="tab-usuarios">
+        <div class="section-title">Usuarios</div>
+        <div class="section-sub">Crea perfiles de admin o vendedor.</div>
+
+        <div class="add-mov" style="margin-bottom:1.5rem;">
+          <div class="add-mov-title" style="font-size:14px;font-weight:500;margin-bottom:1rem;">Nuevo usuario</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Nombre de usuario</label>
+              <input type="text" id="nu-user" placeholder="ej: vendedor1" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Contraseña</label>
+              <input type="password" id="nu-pass" placeholder="••••••••" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Rol</label>
+              <select id="nu-rol" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+                <option value="vendedor">Vendedor</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button onclick="crearUsuario()" style="width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;">+ Crear usuario</button>
+            </div>
+          </div>
+          <div id="nu-msg" style="font-size:12px;margin-top:8px;"></div>
+        </div>
+
+        <div id="usuarios-list"></div>
+      </div>
+
+      <!-- TAB HISTORIAL -->
+      <div class="tab-content" id="tab-historial">
+        <div class="section-title">Historial de ventas</div>
+        <div class="section-sub">Todas las ventas registradas por todos los vendedores.</div>
+        <div id="historial-list"></div>
+      </div>
+
       <!-- TAB CONFIG -->
       <div class="tab-content" id="tab-config">
         <div class="section-title">Configuración</div>
-        <div class="section-sub" style="margin-bottom:1.5rem;">Credenciales de acceso al panel.</div>
+        <div class="section-sub" style="margin-bottom:1.5rem;">Credenciales del administrador principal.</div>
         <div class="change-pw">
           <div class="change-pw-title">Cambiar usuario y contraseña</div>
           <div class="pw-row">
@@ -227,11 +269,6 @@
       </div>
 
     </div>
-  </div>
-
-  <div id="revert-bar" style="display:none;position:sticky;bottom:60px;background:rgba(245,166,35,0.1);border-top:1px solid rgba(245,166,35,0.3);padding:0.75rem 2rem;align-items:center;justify-content:space-between;gap:12px;z-index:49;">
-    <span style="font-size:13px;color:var(--amber);">⚠️ Última venta registrada</span>
-    <button onclick="revertLastSale()" style="font-size:13px;font-weight:500;padding:7px 18px;background:rgba(245,166,35,0.15);color:var(--amber);border:1px solid rgba(245,166,35,0.4);border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;">↩ Revertir</button>
   </div>
 
   <div class="save-bar">
@@ -283,6 +320,8 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   el.classList.add('active');
+  if (name === 'historial') renderHistorial();
+  if (name === 'usuarios') renderUsuarios();
 }
 
 async function getCredentials() {
@@ -313,10 +352,17 @@ function logout() {
   localStorage.removeItem('tvbox_backup');
 }
 
+let usuarios = [];
+let ventas = [];
+
 async function loadData() {
   try {
-    const psnap = await getDoc(doc(db, 'tienda', 'productos'));
-    const csnap = await getDoc(doc(db, 'tienda', 'config'));
+    const [psnap, csnap, usnap, vsnap] = await Promise.all([
+      getDoc(doc(db, 'tienda', 'productos')),
+      getDoc(doc(db, 'tienda', 'config')),
+      getDoc(doc(db, 'tienda', 'usuarios')),
+      getDoc(doc(db, 'tienda', 'ventas')),
+    ]);
     let cloudProducts = psnap.exists() ? (psnap.data().lista || []) : getDefaultProducts();
     const localBackup = localStorage.getItem('tvbox_backup');
     if (localBackup) {
@@ -330,6 +376,8 @@ async function loadData() {
     } else {
       products = cloudProducts;
     }
+    usuarios = usnap.exists() ? (usnap.data().lista || []) : [];
+    ventas   = vsnap.exists() ? (vsnap.data().lista || []) : [];
     const waVal = csnap.exists() ? (csnap.data().wa || '+56912345678') : '+56912345678';
     document.getElementById('wa-cfg').value = waVal;
     nextId = products.reduce((m,p) => Math.max(m, p.id), 0) + 1;
@@ -388,39 +436,6 @@ function removeProduct(id) {
 
 let lastSale = null;
 
-function changeStock(id, delta) {
-  const p = products.find(p => p.id === id);
-  if (!p) return;
-  if (delta < 0) {
-    if ((p.stock || 0) <= 0) return;
-    if (!confirm(`¿Confirmar venta de 1 unidad de "${p.name}"?`)) return;
-    p.stock = (p.stock || 0) - 1;
-    p.vendidos = (p.vendidos || 0) + 1;
-    lastSale = { id, name: p.name };
-    document.getElementById('revert-bar').style.display = 'flex';
-  }
-  const val = document.getElementById(`sv-${id}`);
-  const badge = document.getElementById(`sb-${id}`);
-  if (val) val.textContent = p.stock;
-  if (badge) { badge.textContent = p.stock > 0 ? 'En stock' : 'Sin stock'; badge.className = `stock-badge ${p.stock > 0 ? 'ok' : 'out'}`; }
-  updateMetrics(); markUnsaved();
-}
-
-function revertLastSale() {
-  if (!lastSale) return;
-  const p = products.find(p => p.id === lastSale.id);
-  if (!p) return;
-  p.stock = (p.stock || 0) + 1;
-  p.vendidos = Math.max(0, (p.vendidos || 0) - 1);
-  const val = document.getElementById(`sv-${lastSale.id}`);
-  const badge = document.getElementById(`sb-${lastSale.id}`);
-  if (val) val.textContent = p.stock;
-  if (badge) { badge.textContent = p.stock > 0 ? 'En stock' : 'Sin stock'; badge.className = `stock-badge ${p.stock > 0 ? 'ok' : 'out'}`; }
-  lastSale = null;
-  document.getElementById('revert-bar').style.display = 'none';
-  updateMetrics(); markUnsaved();
-}
-
 function renderList() {
   const list = document.getElementById('prod-list');
   list.innerHTML = products.map(p => {
@@ -431,11 +446,7 @@ function renderList() {
       <div class="prod-card-top">
         <div class="prod-card-name">${p.name}</div>
         <div class="prod-card-actions">
-          <div class="stock-ctrl">
-            <button class="stock-btn minus" onclick="changeStock(${p.id},-1)">− Venta</button>
-            <span class="stock-val" id="sv-${p.id}">${stock}</span>
-          </div>
-          <span class="stock-badge ${stock>0?'ok':'out'}" id="sb-${p.id}">${stock>0?'En stock':'Sin stock'}</span>
+          <span class="stock-badge ${stock>0?'ok':'out'}" id="sb-${p.id}">${stock>0?'En stock · '+stock+' uds.':'Sin stock'}</span>
           ${products.length > 1 ? `<button class="btn-del" onclick="removeProduct(${p.id})">Eliminar</button>` : ''}
         </div>
       </div>
@@ -554,10 +565,88 @@ async function changePassword() {
   setTimeout(() => { msg.textContent=''; }, 3000);
 }
 
+async function crearUsuario() {
+  const user = document.getElementById('nu-user').value.trim();
+  const pass = document.getElementById('nu-pass').value;
+  const rol  = document.getElementById('nu-rol').value;
+  const msg  = document.getElementById('nu-msg');
+  if (!user || !pass) { msg.style.color='var(--bad)'; msg.textContent='Completa usuario y contraseña.'; return; }
+  if (pass.length < 4) { msg.style.color='var(--bad)'; msg.textContent='Contraseña mínimo 4 caracteres.'; return; }
+  if (usuarios.find(u => u.user === user)) { msg.style.color='var(--bad)'; msg.textContent='Ese usuario ya existe.'; return; }
+  usuarios.push({ user, pass, rol });
+  await setDoc(doc(db,'tienda','usuarios'), { lista: usuarios });
+  document.getElementById('nu-user').value='';
+  document.getElementById('nu-pass').value='';
+  msg.style.color='var(--good)'; msg.textContent=`Usuario "${user}" creado como ${rol}.`;
+  setTimeout(() => { msg.textContent=''; }, 3000);
+  renderUsuarios();
+}
+
+async function eliminarUsuario(user) {
+  if (!confirm(`¿Eliminar usuario "${user}"?`)) return;
+  usuarios = usuarios.filter(u => u.user !== user);
+  await setDoc(doc(db,'tienda','usuarios'), { lista: usuarios });
+  renderUsuarios();
+}
+
+function renderUsuarios() {
+  const el = document.getElementById('usuarios-list');
+  if (!usuarios.length) { el.innerHTML='<p style="font-size:13px;color:var(--muted);">No hay usuarios creados.</p>'; return; }
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;">Usuario</th>
+          <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;">Rol</th>
+          <th style="padding:8px 10px;border-bottom:1px solid var(--border);"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${usuarios.map(u => `
+          <tr>
+            <td style="padding:10px 10px;border-bottom:1px solid var(--border);color:var(--text);">${u.user}</td>
+            <td style="padding:10px 10px;border-bottom:1px solid var(--border);">
+              <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;${u.rol==='admin'?'background:rgba(79,142,247,0.1);color:var(--accent);border:1px solid rgba(79,142,247,0.2);':'background:rgba(62,207,142,0.1);color:var(--good);border:1px solid rgba(62,207,142,0.2);'}">${u.rol}</span>
+            </td>
+            <td style="padding:10px 10px;border-bottom:1px solid var(--border);text-align:right;">
+              <button onclick="eliminarUsuario('${u.user}')" style="font-size:12px;padding:4px 12px;background:rgba(255,102,102,0.08);color:var(--bad);border:1px solid rgba(255,102,102,0.2);border-radius:7px;cursor:pointer;">Eliminar</button>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderHistorial() {
+  const el = document.getElementById('historial-list');
+  if (!ventas.length) { el.innerHTML='<p style="font-size:13px;color:var(--muted);padding:1rem 0;">No hay ventas registradas aún.</p>'; return; }
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr>
+          ${['Fecha','Vendedor','Producto','Cliente','Teléfono','Dirección','Pago','Monto'].map(h=>`<th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;">${h}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${[...ventas].reverse().map(v=>`
+          <tr>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--muted);white-space:nowrap;">${v.fecha||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--accent);">${v.vendedor||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);font-weight:500;">${v.producto||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);">${v.cliente||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--muted);">${v.telefono||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--muted);">${v.direccion||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--muted);">${v.pago||'—'}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--good);font-weight:500;">${fmt(v.monto||0)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
 window.doLogin=doLogin; window.logout=logout; window.switchTab=switchTab;
-window.addProduct=addProduct; window.removeProduct=removeProduct; window.changeStock=changeStock;
+window.addProduct=addProduct; window.removeProduct=removeProduct;
 window.updateField=updateField; window.updatePhoto=updatePhoto; window.updateMetrics=updateMetrics;
-window.saveAll=saveAll; window.changePassword=changePassword; window.revertLastSale=revertLastSale;
+window.saveAll=saveAll; window.changePassword=changePassword;
+window.crearUsuario=crearUsuario; window.eliminarUsuario=eliminarUsuario;
 window.fmt=fmt; window.cleanPrice=cleanPrice;
 
 document.getElementById('login-btn').addEventListener('click', doLogin);
