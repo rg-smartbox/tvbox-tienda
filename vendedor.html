@@ -137,7 +137,7 @@
             </div>
             <div class="field">
               <label>Nombre del cliente</label>
-              <input type="text" id="v-cliente" placeholder="Nombre completo">
+              <input type="text" id="v-cliente" placeholder="Nombre completo" style="text-transform:uppercase;">
             </div>
             <div class="field">
               <label>Teléfono</label>
@@ -145,11 +145,11 @@
             </div>
             <div class="field field-full">
               <label>Dirección de envío</label>
-              <input type="text" id="v-direccion" placeholder="Calle, número">
+              <input type="text" id="v-direccion" placeholder="Calle, número" style="text-transform:uppercase;">
             </div>
             <div class="field">
               <label>Comuna</label>
-              <input type="text" id="v-comuna" placeholder="ej: Santiago, Viña del Mar">
+              <input type="text" id="v-comuna" placeholder="ej: Santiago, Viña del Mar" style="text-transform:uppercase;">
             </div>
             <div class="field field-full">
               <button class="btn-submit" id="btn-vender">Confirmar venta →</button>
@@ -268,13 +268,13 @@ function renderProductSelect() {
 
 async function registrarVenta() {
   const prodId   = parseInt(document.getElementById('v-producto').value);
-  const cliente  = document.getElementById('v-cliente').value.trim();
+  const cliente  = document.getElementById('v-cliente').value.trim().toUpperCase();
   const telefono = document.getElementById('v-telefono').value.trim();
-  const direccion= document.getElementById('v-direccion').value.trim();
+  const direccion= document.getElementById('v-direccion').value.trim().toUpperCase();
   const pago     = document.getElementById('v-pago').value;
   const msg      = document.getElementById('form-msg');
 
-  const comuna   = document.getElementById('v-comuna').value.trim();
+  const comuna   = document.getElementById('v-comuna').value.trim().toUpperCase();
 
   if (!cliente || !telefono || !direccion || !comuna) {
     msg.className='form-msg err'; msg.textContent='Completa todos los campos del cliente.'; return;
