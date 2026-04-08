@@ -489,14 +489,14 @@ function renderList() {
           <label>Agregar unidades al stock</label>
           <div style="display:flex;gap:6px;">
             <input type="number" min="0" value="0" id="add-stock-${p.id}" placeholder="0" style="flex:1;">
-            <button onclick="var v=parseInt(document.getElementById('add-stock-${p.id}').value)||0;addStock(${p.id},v);document.getElementById('add-stock-${p.id}').value=0;" style="padding:0 14px;background:rgba(62,207,142,0.15);color:var(--good);border:1px solid rgba(62,207,142,0.3);border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">+ Agregar</button>
+            <button data-action="add-stock" data-id="${p.id}" style="padding:0 14px;background:rgba(62,207,142,0.15);color:var(--good);border:1px solid rgba(62,207,142,0.3);border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">+ Agregar</button>
           </div>
         </div>
         <div class="field">
           <label style="color:var(--amber);">Quitar unidades (corrección)</label>
           <div style="display:flex;gap:6px;">
             <input type="number" min="0" value="0" id="rm-stock-${p.id}" placeholder="0" style="flex:1;border-color:rgba(245,166,35,0.3);">
-            <button onclick="var v=parseInt(document.getElementById('rm-stock-${p.id}').value)||0;removeStock(${p.id},v);document.getElementById('rm-stock-${p.id}').value=0;" style="padding:0 14px;background:rgba(245,166,35,0.15);color:var(--amber);border:1px solid rgba(245,166,35,0.3);border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">− Quitar</button>
+            <button data-action="rm-stock" data-id="${p.id}" style="padding:0 14px;background:rgba(245,166,35,0.15);color:var(--amber);border:1px solid rgba(245,166,35,0.3);border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">− Quitar</button>
           </div>
         </div>
         <div class="field field-full">
@@ -724,6 +724,23 @@ window.fmt=fmt; window.cleanPrice=cleanPrice;
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('pw-input').focus(); });
 document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const id = parseInt(btn.dataset.id);
+  if (action === 'add-stock') {
+    const val = parseInt(document.getElementById(`add-stock-${id}`).value) || 0;
+    addStock(id, val);
+    document.getElementById(`add-stock-${id}`).value = 0;
+  }
+  if (action === 'rm-stock') {
+    const val = parseInt(document.getElementById(`rm-stock-${id}`).value) || 0;
+    removeStock(id, val);
+    document.getElementById(`rm-stock-${id}`).value = 0;
+  }
+});
 
 window.addEventListener('beforeunload', e => { if (unsaved) { e.preventDefault(); e.returnValue=''; } });
 </script>
