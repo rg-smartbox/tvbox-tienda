@@ -388,10 +388,6 @@ function renderList() {
           <label>Costo por unidad ($)</label>
           <input type="number" min="0" value="${p.costo??0}" oninput="updateField(${p.id},'costo',parseInt(this.value)||0)">
         </div>
-        <div class="field">
-          <label>Stock</label>
-          <input type="number" min="0" value="${stock}" oninput="updateField(${p.id},'stock',parseInt(this.value)||0);document.getElementById('sv-${p.id}').textContent=this.value||0">
-        </div>
         <div class="field field-full">
           <label>Descripción</label>
           <input type="text" value="${p.desc}" oninput="updateField(${p.id},'desc',this.value)">
