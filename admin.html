@@ -54,9 +54,12 @@
   .config-box label { font-size: 13px; color: var(--muted); white-space: nowrap; }
   .config-box input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; flex: 1; min-width: 160px; outline: none; }
   .prod-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.25rem; }
-  .prod-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
+  .prod-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
   .prod-card.is-featured { border-color: rgba(79,142,247,0.35); }
-  .prod-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+  .prod-card-top { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; flex-wrap: wrap; gap: 8px; cursor: pointer; user-select: none; }
+  .prod-card-top:hover { background: rgba(255,255,255,0.02); }
+  .prod-card-body { display: none; padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border); }
+  .prod-card-body.open { display: block; }
   .prod-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
   .prod-card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .btn-del { font-size: 12px; padding: 5px 12px; background: rgba(255,102,102,0.08); color: var(--bad); border: 1px solid rgba(255,102,102,0.2); border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
@@ -416,6 +419,14 @@ async function removeStock(id) {
   updateMetrics(); markUnsaved();
 }
 
+function toggleCard(id) {
+  const body = document.getElementById('body-'+id);
+  const arrow = document.getElementById('arrow-'+id);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open');
+  arrow.textContent = isOpen ? '▸' : '▾';
+}
+
 function renderList() {
   const list = document.getElementById('prod-list');
   list.innerHTML = products.map(p => {
@@ -429,14 +440,18 @@ function renderList() {
       '</div>'
     ).join('');
     return '<div class="prod-card'+(p.featured?' is-featured':'')+'" id="card-'+p.id+'">' +
-      '<div class="prod-card-top">' +
-        '<div class="prod-card-name">'+p.name+'</div>' +
+      '<div class="prod-card-top" onclick="toggleCard('+p.id+')">' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span id="arrow-'+p.id+'" style="color:var(--muted);font-size:12px;">▸</span>' +
+          '<div class="prod-card-name">'+p.name+'</div>' +
+        '</div>' +
         '<div class="prod-card-actions">' +
           '<span class="stock-badge '+(stock>0?'ok':'out')+'" id="sb-'+p.id+'">'+(stock>0?'En stock · '+stock+' uds.':'Sin stock')+'</span>' +
-          (products.length>1?'<button class="btn-del" onclick="removeProduct('+p.id+')">Eliminar</button>':'') +
+          (products.length>1?'<button class="btn-del" onclick="event.stopPropagation();removeProduct('+p.id+')">Eliminar</button>':'') +
         '</div>' +
       '</div>' +
-      '<div class="fields-grid">' +
+      '<div class="prod-card-body" id="body-'+p.id+'">' +
+      '<div class="fields-grid" style="padding-top:1rem;">' +
         '<div class="field"><label>Nombre</label><input type="text" value="'+p.name+'" oninput="updateField('+p.id+',\'name\',this.value)"></div>' +
         '<div class="field"><label>Precio de venta</label><input type="text" value="'+fmt(cleanPrice(p.price||'0'))+'" onblur="this.value=fmt(cleanPrice(this.value));updateField('+p.id+',\'price\',cleanPrice(this.value).toString())"></div>' +
         '<div class="field"><label>Costo por unidad ($)</label><input type="text" value="'+fmt(p.costo||0)+'" onblur="this.value=fmt(cleanPrice(this.value));updateField('+p.id+',\'costo\',cleanPrice(this.value))"></div>' +
@@ -447,7 +462,7 @@ function renderList() {
         '<div class="field" style="display:flex;align-items:flex-end;"><div class="featured-row"><input type="checkbox" id="ft-'+p.id+'" '+(p.featured?'checked':'')+' onchange="updateField('+p.id+',\'featured\',this.checked)"><label for="ft-'+p.id+'">Destacado</label></div></div>' +
         '<div class="field field-full" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:4px;"><label style="font-size:12px;color:var(--accent);margin-bottom:8px;display:block;">Fotos (links de Cloudinary)</label>'+photoInputs+'</div>' +
         '<div class="field field-full"><label>Video de YouTube (link)</label><input type="text" placeholder="https://youtube.com/watch?v=..." value="'+(p.video||'')+'" oninput="updateField('+p.id+',\'video\',this.value)"></div>' +
-      '</div></div>';
+      '</div></div></div>';
   }).join('');
 }
 
