@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TV Box Pro — Equipos optimizados</title>
+<title>RG SmartBox — Equipos optimizados</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c26;
-    --border: rgba(255,255,255,0.07);
-    --accent: #ff6b1a;
-    --accent-hover: #e85c0d;
+    --bg: #050a1a;
+    --surface: #0a1428;
+    --surface2: #0f1e38;
+    --border: rgba(255,255,255,0.08);
+    --accent: #f5c400;
+    --accent-hover: #d4a800;
     --good: #3ecf8e;
     --bad: #f66;
     --text: #f0f0f5;
-    --muted: #7a7a90;
+    --muted: #7a8aaa;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -25,12 +25,12 @@
   nav {
     display: flex; align-items: center; justify-content: space-between;
     padding: 1.25rem 2rem; border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; background: rgba(10,10,15,0.92);
+    position: sticky; top: 0; background: rgba(5,10,26,0.95);
     backdrop-filter: blur(12px); z-index: 100;
   }
   .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--text); }
   .logo span { color: var(--accent); }
-  .nav-badge { font-size: 12px; background: rgba(255,107,26,0.1); color: var(--accent); border: 1px solid rgba(255,107,26,0.25); padding: 4px 12px; border-radius: 20px; }
+  .nav-badge { font-size: 12px; background: rgba(245,196,0,0.1); color: var(--accent); border: 1px solid rgba(245,196,0,0.3); padding: 4px 12px; border-radius: 20px; }
 
   .hero { text-align: center; padding: 5rem 2rem 4rem; max-width: 750px; margin: 0 auto; }
   .hero-chip {
@@ -52,7 +52,7 @@
   .hero p { font-size: 16px; color: var(--muted); max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.7; }
   .hero-cta {
     display: inline-flex; align-items: center; gap: 8px;
-    background: var(--accent); color: white; font-weight: 500; font-size: 15px;
+    background: var(--accent); color: #050a1a; font-weight: 700; font-size: 15px;
     padding: 14px 32px; border-radius: 10px; text-decoration: none; transition: background 0.15s;
   }
   .hero-cta:hover { background: var(--accent-hover); }
@@ -82,19 +82,19 @@
   #productos { padding: 1rem 2rem 4rem; max-width: 960px; margin: 0 auto; text-align: center; }
   .products-scroll { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 2rem; justify-content: center; }
   .pcard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; transition: border-color 0.2s, transform 0.2s; width: 280px; flex-shrink: 0; }
-  .pcard:hover { border-color: rgba(255,107,26,0.3); transform: translateY(-2px); }
-  .pcard.featured { border-color: rgba(255,107,26,0.5); }
+  .pcard:hover { border-color: rgba(245,196,0,0.3); transform: translateY(-2px); }
+  .pcard.featured { border-color: rgba(245,196,0,0.5); }
   .ptag { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 12px; border-radius: 20px; margin-bottom: 1rem; align-self: flex-start; }
-  .ptag-amber,.ptag-blue { background: rgba(255,107,26,0.1); color: var(--accent); border: 1px solid rgba(255,107,26,0.25); }
+  .ptag-amber,.ptag-blue { background: rgba(245,196,0,0.1); color: var(--accent); border: 1px solid rgba(245,196,0,0.3); }
   .ptag-green { background: rgba(62,207,142,0.1); color: var(--good); border: 1px solid rgba(62,207,142,0.2); }
   .pname { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
   .pdesc { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; flex: 1; }
-  .pprice { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .pprice { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--accent); margin-bottom: 3px; }
   .pprice-sub { font-size: 12px; color: var(--muted); margin-bottom: 1rem; }
-  .pbtn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 9px; padding: 11px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; text-decoration: none; display: block; text-align: center; }
+  .pbtn { width: 100%; background: var(--accent); color: #050a1a; border: none; border-radius: 9px; padding: 11px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; text-decoration: none; display: block; text-align: center; }
   .pbtn:hover { background: var(--accent-hover); }
-  .btn-video { width: 100%; background: rgba(255,107,26,0.12); color: var(--accent); border: 1px solid rgba(255,107,26,0.35); border-radius: 9px; padding: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, border-color 0.15s; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; }
-  .btn-video:hover { background: rgba(255,107,26,0.2); border-color: rgba(255,107,26,0.6); }
+  .btn-video { width: 100%; background: rgba(245,196,0,0.08); color: var(--accent); border: 1px solid rgba(245,196,0,0.25); border-radius: 9px; padding: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .btn-video:hover { background: rgba(245,196,0,0.15); }
 
   .gallery { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; background: var(--surface2); }
   .gallery img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.35s; }
@@ -127,23 +127,30 @@
 <body>
 
 <nav>
-  <div class="logo">TV<span>Box</span>Pro</div>
-  <span class="nav-badge">Equipos optimizados</span>
+  <div class="logo">RG <span>Smart</span>Box</div>
+  <span class="nav-badge">Entrega inmediata</span>
 </nav>
 
 <div class="hero">
   <div class="hero-chip">Listos para usar desde el primer día</div>
-  <h1>TV Box que funcionan<br>de <em>verdad</em></h1>
+  <h1>SmartBox que funcionan<br>de <em>verdad</em></h1>
   <p>Cada equipo sale limpio y optimizado. Sin apps basura, sin nada que lo haga lento. Enchúfalo y listo.</p>
-  <a href="#productos" class="hero-cta">Ver equipos disponibles →</a>
+</div>
+
+<div id="productos">
+  <div class="section-label" style="text-align:center;">Catálogo</div>
+  <div class="section-title" style="text-align:center;">Elige tu equipo</div>
+  <div class="products-scroll" id="products-grid">
+    <div class="no-products">Cargando productos...</div>
+  </div>
 </div>
 
 <div class="section">
   <div class="section-label">La diferencia</div>
-  <div class="section-title">🔥 ¿Por qué nuestros TV Box son distintos?</div>
+  <div class="section-title">🔥 ¿Por qué nuestros SmartBox son distintos?</div>
   <div class="diff-grid">
     <div class="diff-col bad">
-      <div class="diff-col-title"><span></span>❌ Otros TV Box</div>
+      <div class="diff-col-title"><span></span>❌ Otros SmartBox</div>
       <div class="ditem"><span class="ditem-dot"></span>Llenos de apps que no usas</div>
       <div class="ditem"><span class="ditem-dot"></span>Lentos desde el primer día</div>
       <div class="ditem"><span class="ditem-dot"></span>Memoria ocupada en segundo plano</div>
@@ -157,16 +164,8 @@
       <div class="ditem"><span class="ditem-dot"></span>Abren apps al instante, sin esperas</div>
     </div>
   </div>
-  <div style="margin-top:12px;background:rgba(255,107,26,0.08);border:1px solid rgba(255,107,26,0.2);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:500;color:var(--accent);text-align:center;">
+  <div style="margin-top:12px;background:rgba(245,196,0,0.08);border:1px solid rgba(245,196,0,0.25);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:500;color:var(--accent);text-align:center;">
     ⚡ Resultado: una experiencia fluida, sin lag
-  </div>
-</div>
-
-<div id="productos">
-  <div class="section-label" style="text-align:center;">Catálogo</div>
-  <div class="section-title" style="text-align:center;">Elige tu equipo</div>
-  <div class="products-scroll" id="products-grid">
-    <div class="no-products">Cargando productos...</div>
   </div>
 </div>
 
