@@ -501,6 +501,8 @@ function copiarPost() {
     setTimeout(() => { msg.style.display = 'none'; }, 2500);
   });
 }
+
+function calcPrecio(id) {
   const p = products.find(p=>p.id===id);
   if (!p) return;
   const costoConIva = cleanPrice(document.getElementById('costo-'+id).value) || p.costo || 0;
