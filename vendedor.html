@@ -268,12 +268,18 @@ async function registrarProspecto() {
   }
   const p = products.find(p=>p.id===prodId);
   if (!p) { msg.className='form-msg err'; msg.textContent='Selecciona un producto.'; return; }
+  if ((p.stock||0) < cantidad) {
+    msg.className='form-msg err'; msg.textContent='Solo hay '+( p.stock||0)+' unidad(es) disponibles.'; return;
+  }
 
   const btn = document.querySelector('.btn-submit');
   btn.disabled=true; btn.textContent='Registrando...';
 
   const montoBase = cleanPrice(p.price||'0') * cantidad;
   const montoFinal = Math.max(0, montoBase - descuento);
+
+  // Descontar stock al crear prospecto
+  p.stock = (p.stock||0) - cantidad;
 
   ventas.push({
     fecha: new Date().toLocaleDateString('es-CL'),
@@ -286,8 +292,11 @@ async function registrarProspecto() {
   });
 
   try {
-    await db.doc('tienda/ventas').set({lista:ventas});
-    msg.className='form-msg ok'; msg.textContent='📋 Prospecto de "'+p.name+'" registrado.';
+    await Promise.all([
+      db.doc('tienda/ventas').set({lista:ventas}),
+      db.doc('tienda/productos').set({lista:products}),
+    ]);
+    msg.className='form-msg ok'; msg.textContent='📋 Prospecto de "'+p.name+'" registrado. Stock reservado.';
     document.getElementById('v-cliente').value='';
     document.getElementById('v-telefono').value='+56';
     document.getElementById('v-direccion').value='';
@@ -309,10 +318,9 @@ async function confirmarVenta(index) {
   const p = products.find(p=>p.name===v.producto);
   if (!p) { alert('Producto no encontrado.'); return; }
   const cantidad = v.cantidad||1;
-  if ((p.stock||0) < cantidad) { alert('Stock insuficiente. Solo hay '+( p.stock||0)+' unidad(es).'); return; }
-  if (!confirm('¿Confirmar venta de "'+v.producto+'" x'+cantidad+' para '+v.cliente+'?\n\nSe descontará el stock.')) return;
+  if (!confirm('¿Confirmar venta de "'+v.producto+'" x'+cantidad+' para '+v.cliente+'?\n\nSe registrará como venta cerrada.')) return;
   v.estado = 'venta';
-  p.stock = (p.stock||0) - cantidad;
+  // Stock ya fue descontado al crear el prospecto, solo sumamos vendidos
   p.vendidos = (p.vendidos||0) + cantidad;
   try {
     await Promise.all([
