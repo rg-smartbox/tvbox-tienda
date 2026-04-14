@@ -230,7 +230,8 @@
 
 <!-- POST MODAL -->
 <div class="modal-overlay" id="post-modal-overlay">
-  <div class="modal-box" style="max-width:500px;">
+  <div class="modal-box" style="max-width:500px;position:relative;">
+    <button onclick="document.getElementById('post-modal-overlay').classList.remove('open')" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;">✕</button>
     <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--accent);">📣 Post para Facebook</div>
     <textarea id="post-text" style="width:100%;height:200px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;resize:none;line-height:1.6;"></textarea>
     <div style="display:flex;gap:10px;margin-top:12px;justify-content:flex-end;">
@@ -455,7 +456,7 @@ function generarOtro() {
   const p = products.find(p=>p.id===_postProductId);
   if (!p) return;
   const precio = fmt(cleanPrice(p.price||'0'));
-  const url = 'https://unprec.github.io/tvbox-tienda/';
+  const url = 'https://rg-smartbox.github.io/tvbox-tienda/';
   const aperturas = [
     '🔥 ¡Atención!',
     '⚡ ¡Oferta disponible!',
