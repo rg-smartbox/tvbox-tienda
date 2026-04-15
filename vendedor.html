@@ -80,7 +80,7 @@
 
 <div id="main-screen">
   <nav>
-    <div class="logo">TV<span>Box</span>Pro</div>
+    <div class="logo">RG <span>Smart</span>Box</div>
     <div class="nav-right">
       <span class="vendedor-badge" id="vendedor-nombre">Vendedor</span>
       <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -289,6 +289,7 @@ async function registrarProspecto() {
     descuento: descuento||0,
     monto: montoFinal,
     estado: 'prospecto',
+    stockDescontado: true,
   });
 
   try {
@@ -318,9 +319,16 @@ async function confirmarVenta(index) {
   const p = products.find(p=>p.name===v.producto);
   if (!p) { alert('Producto no encontrado.'); return; }
   const cantidad = v.cantidad||1;
+  // Si el prospecto no tiene stockDescontado (fue creado con lógica antigua), verificar stock
+  if (!v.stockDescontado && (p.stock||0) < cantidad) {
+    alert('Stock insuficiente. Solo hay '+(p.stock||0)+' unidad(es).'); return;
+  }
   if (!confirm('¿Confirmar venta de "'+v.producto+'" x'+cantidad+' para '+v.cliente+'?\n\nSe registrará como venta cerrada.')) return;
   v.estado = 'venta';
-  // Stock ya fue descontado al crear el prospecto, solo sumamos vendidos
+  // Si el stock no fue descontado al crear el prospecto, descontarlo ahora
+  if (!v.stockDescontado) {
+    p.stock = (p.stock||0) - cantidad;
+  }
   p.vendidos = (p.vendidos||0) + cantidad;
   try {
     await Promise.all([
