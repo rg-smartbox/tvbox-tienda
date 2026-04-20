@@ -99,35 +99,78 @@
 
       <div class="tab-content active" id="tab-vender">
         <div class="section-title">Stock disponible</div>
-        <div class="section-sub">Selecciona un producto para registrar la venta.</div>
+        <div class="section-sub">Productos con stock disponible para vender.</div>
         <div class="stock-grid" id="stock-grid"></div>
 
         <div class="section-title" style="margin-bottom:0.25rem;">Registrar prospecto</div>
-        <div class="section-sub">Completa los datos del cliente. El stock se descuenta al confirmar la venta.</div>
+        <div class="section-sub">Selecciona el cliente y agrega los productos que compra.</div>
         <div class="sale-form">
-          <div class="form-grid">
-            <div class="field"><label>Producto</label><select id="v-producto" onchange="actualizarTotal()"></select></div>
-            <div class="field"><label>Cantidad</label><input type="number" id="v-cantidad" min="1" value="1" oninput="actualizarTotal()"></div>
-            <div class="field"><label>Método de pago</label>
-              <select id="v-pago">
-                <option value="Transferencia">Transferencia</option>
-                <option value="Efectivo">Efectivo</option>
-                <option value="Débito">Débito</option>
-                <option value="Crédito">Crédito</option>
-              </select>
+
+          <!-- CLIENTE -->
+          <div style="margin-bottom:1.25rem;">
+            <div style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:10px;">👤 Cliente</div>
+            <div style="position:relative;">
+              <input type="text" id="v-cliente-buscar" placeholder="Buscar cliente por nombre..." oninput="buscarCliente()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+              <div id="cliente-sugerencias" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:0 0 8px 8px;z-index:100;max-height:200px;overflow-y:auto;"></div>
             </div>
-            <div class="field"><label>Nombre del cliente</label><input type="text" id="v-cliente" placeholder="Nombre completo" style="text-transform:uppercase;"></div>
-            <div class="field"><label>Teléfono</label><input type="text" id="v-telefono" value="+56"></div>
-            <div class="field field-full"><label>Dirección de envío</label><input type="text" id="v-direccion" placeholder="Calle, número" style="text-transform:uppercase;"></div>
-            <div class="field"><label>Comuna</label><input type="text" id="v-comuna" placeholder="ej: Santiago" style="text-transform:uppercase;"></div>
-            <div class="field"><label>Descuento ($)</label><input type="text" id="v-descuento" value="$0" placeholder="$0" onblur="this.value=fmt(cleanPrice(this.value));actualizarTotal()" oninput="actualizarTotal()"></div>
-            <div class="field" style="display:flex;align-items:flex-end;">
-              <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;width:100%;">
-                <div style="font-size:11px;color:var(--muted);margin-bottom:3px;">Total a cobrar</div>
-                <div id="v-total" style="font-size:18px;font-weight:700;font-family:'Syne',sans-serif;color:var(--good);">$0</div>
+            <div id="cliente-seleccionado" style="display:none;margin-top:8px;background:rgba(62,207,142,0.05);border:1px solid rgba(62,207,142,0.2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+              <div>
+                <div id="cs-nombre" style="font-weight:500;font-size:14px;"></div>
+                <div id="cs-detalle" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
+              </div>
+              <button onclick="limpiarCliente()" style="font-size:12px;padding:4px 10px;background:none;color:var(--muted);border:1px solid var(--border);border-radius:6px;cursor:pointer;">Cambiar</button>
+            </div>
+            <button onclick="mostrarFormNuevoCliente()" id="btn-nuevo-cliente" style="margin-top:8px;font-size:12px;padding:6px 14px;background:none;color:var(--accent);border:1px solid rgba(255,107,26,0.3);border-radius:7px;cursor:pointer;">+ Nuevo cliente</button>
+            <div id="form-nuevo-cliente" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1rem;">
+              <div style="font-size:13px;font-weight:500;margin-bottom:10px;">Nuevo cliente</div>
+              <div class="form-grid">
+                <div class="field"><label>Nombre</label><input type="text" id="nc-nombre" placeholder="Nombre completo" style="text-transform:uppercase;"></div>
+                <div class="field"><label>Teléfono</label><input type="text" id="nc-tel" value="+56"></div>
+                <div class="field field-full"><label>Dirección</label><input type="text" id="nc-direccion" placeholder="Calle, número" style="text-transform:uppercase;"></div>
+                <div class="field"><label>Comuna</label><input type="text" id="nc-comuna" placeholder="ej: Santiago" style="text-transform:uppercase;"></div>
+                <div class="field field-full" style="display:flex;gap:8px;">
+                  <button onclick="guardarNuevoCliente()" style="padding:9px 18px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Guardar cliente</button>
+                  <button onclick="document.getElementById('form-nuevo-cliente').style.display='none'" style="padding:9px 14px;background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;">Cancelar</button>
+                  <span id="nc-msg" style="font-size:12px;align-self:center;"></span>
+                </div>
               </div>
             </div>
-            <div class="field field-full"><button class="btn-submit" onclick="registrarProspecto()">Registrar prospecto →</button></div>
+          </div>
+
+          <!-- PRODUCTOS -->
+          <div style="margin-bottom:1.25rem;border-top:1px solid var(--border);padding-top:1.25rem;">
+            <div style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:10px;">🛒 Productos</div>
+            <div class="form-grid" style="margin-bottom:10px;">
+              <div class="field"><label>Producto</label><select id="v-producto" onchange="actualizarTotal()"></select></div>
+              <div class="field"><label>Cantidad</label><input type="number" id="v-cantidad" min="1" value="1" oninput="actualizarTotal()"></div>
+              <div class="field"><label>Descuento por unidad ($)</label><input type="text" id="v-descuento" value="$0" onblur="this.value=fmt(cleanPrice(this.value));actualizarTotal()" oninput="actualizarTotal()"></div>
+              <div class="field" style="display:flex;align-items:flex-end;">
+                <button onclick="agregarAlCarrito()" style="width:100%;padding:10px;background:rgba(62,207,142,0.15);color:var(--good);border:1px solid rgba(62,207,142,0.3);border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;">+ Agregar al carrito</button>
+              </div>
+            </div>
+            <div id="carrito" style="display:none;margin-top:10px;">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Productos en esta venta:</div>
+              <div id="carrito-items"></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+                <div style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif;">Total: <span id="v-total" style="color:var(--good);">$0</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGO -->
+          <div style="border-top:1px solid var(--border);padding-top:1.25rem;">
+            <div style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:10px;">💳 Pago</div>
+            <div class="form-grid">
+              <div class="field"><label>Método de pago</label>
+                <select id="v-pago">
+                  <option value="Transferencia">Transferencia</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Débito">Débito</option>
+                  <option value="Crédito">Crédito</option>
+                </select>
+              </div>
+              <div class="field field-full"><button class="btn-submit" onclick="registrarProspecto()">Registrar prospecto →</button></div>
+            </div>
           </div>
           <div class="form-msg" id="form-msg"></div>
         </div>
@@ -160,6 +203,9 @@ const db = firebase.firestore();
 let currentUser = null;
 let products = [];
 let ventas = [];
+let clientes = [];
+let carrito = []; // [{producto, cantidad, descuento, monto}]
+let clienteSeleccionado = null;
 let unsubProducts = null;
 let unsubVentas = null;
 
@@ -221,6 +267,104 @@ function loadData() {
     ventas = snap.exists ? (snap.data().lista||[]) : [];
     renderHistorial();
   });
+  db.doc('tienda/clientes').get().then(snap => {
+    clientes = snap.exists ? (snap.data().lista||[]) : [];
+  });
+}
+
+// ---- CLIENTES ----
+function buscarCliente() {
+  const q = document.getElementById('v-cliente-buscar').value.trim().toLowerCase();
+  const sug = document.getElementById('cliente-sugerencias');
+  if (!q) { sug.style.display='none'; return; }
+  const res = clientes.filter(c=>c.nombre.toLowerCase().includes(q));
+  if (!res.length) { sug.style.display='none'; return; }
+  sug.style.display='block';
+  sug.innerHTML = res.map((c,i)=>
+    '<div onclick="seleccionarCliente('+clientes.indexOf(c)+')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:14px;" onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'\'">'+
+    '<div style="font-weight:500;">'+c.nombre+'</div>'+
+    '<div style="font-size:12px;color:var(--muted);">'+c.telefono+' · '+c.comuna+'</div></div>'
+  ).join('');
+}
+
+function seleccionarCliente(i) {
+  clienteSeleccionado = clientes[i];
+  document.getElementById('v-cliente-buscar').value = clienteSeleccionado.nombre;
+  document.getElementById('cliente-sugerencias').style.display='none';
+  document.getElementById('cliente-seleccionado').style.display='flex';
+  document.getElementById('cs-nombre').textContent = clienteSeleccionado.nombre;
+  document.getElementById('cs-detalle').textContent = clienteSeleccionado.telefono+' · '+clienteSeleccionado.direccion+', '+clienteSeleccionado.comuna;
+  document.getElementById('btn-nuevo-cliente').style.display='none';
+}
+
+function limpiarCliente() {
+  clienteSeleccionado = null;
+  document.getElementById('v-cliente-buscar').value='';
+  document.getElementById('cliente-seleccionado').style.display='none';
+  document.getElementById('btn-nuevo-cliente').style.display='inline-block';
+}
+
+function mostrarFormNuevoCliente() {
+  document.getElementById('form-nuevo-cliente').style.display='block';
+  document.getElementById('btn-nuevo-cliente').style.display='none';
+}
+
+async function guardarNuevoCliente() {
+  const nombre = document.getElementById('nc-nombre').value.trim().toUpperCase();
+  const tel = document.getElementById('nc-tel').value.trim();
+  const dir = document.getElementById('nc-direccion').value.trim().toUpperCase();
+  const com = document.getElementById('nc-comuna').value.trim().toUpperCase();
+  const msg = document.getElementById('nc-msg');
+  if (!nombre||!tel) { msg.style.color='var(--bad)'; msg.textContent='Nombre y teléfono son obligatorios.'; return; }
+  const nuevo = {nombre, telefono:tel, direccion:dir, comuna:com};
+  clientes.push(nuevo);
+  await db.doc('tienda/clientes').set({lista:clientes});
+  msg.style.color='var(--good)'; msg.textContent='Cliente guardado.';
+  setTimeout(()=>{ msg.textContent=''; document.getElementById('form-nuevo-cliente').style.display='none'; document.getElementById('btn-nuevo-cliente').style.display='inline-block'; },1500);
+  seleccionarCliente(clientes.length-1);
+}
+
+// ---- CARRITO ----
+function agregarAlCarrito() {
+  const prodId = parseInt(document.getElementById('v-producto').value);
+  const cantidad = parseInt(document.getElementById('v-cantidad').value)||1;
+  const descuento = cleanPrice(document.getElementById('v-descuento').value)||0;
+  const p = products.find(p=>p.id===prodId);
+  if (!p) return;
+  const stockDisponible = p.stock - carrito.filter(i=>i.productoId===prodId).reduce((s,i)=>s+i.cantidad,0);
+  if (cantidad > stockDisponible) {
+    document.getElementById('form-msg').className='form-msg err';
+    document.getElementById('form-msg').textContent='Solo hay '+stockDisponible+' unidad(es) disponibles.';
+    return;
+  }
+  carrito.push({productoId:prodId, producto:p.name, precio:cleanPrice(p.price||'0'), cantidad, descuento});
+  document.getElementById('v-cantidad').value='1';
+  document.getElementById('v-descuento').value='$0';
+  document.getElementById('form-msg').textContent='';
+  renderCarrito();
+}
+
+function quitarDelCarrito(i) {
+  carrito.splice(i,1);
+  renderCarrito();
+}
+
+function renderCarrito() {
+  const el = document.getElementById('carrito');
+  const items = document.getElementById('carrito-items');
+  if (!carrito.length) { el.style.display='none'; return; }
+  el.style.display='block';
+  let total = 0;
+  items.innerHTML = carrito.map((item,i)=>{
+    const subtotal = item.precio*item.cantidad - item.descuento*item.cantidad;
+    total += subtotal;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;">'+
+      '<div style="font-size:13px;font-weight:500;">'+item.producto+'</div>'+
+      '<div style="font-size:12px;color:var(--muted);">x'+item.cantidad+(item.descuento>0?' · -'+fmt(item.descuento*item.cantidad):'')+' = <span style="color:var(--good);font-weight:600;">'+fmt(subtotal)+'</span></div>'+
+      '<button onclick="quitarDelCarrito('+i+')" style="font-size:11px;padding:3px 8px;background:rgba(255,102,102,0.08);color:var(--bad);border:1px solid rgba(255,102,102,0.2);border-radius:6px;cursor:pointer;">✕</button>'+
+      '</div>';
+  }).join('');
+  document.getElementById('v-total').textContent = fmt(total);
 }
 
 function renderStock() {
@@ -235,13 +379,13 @@ function renderStock() {
 }
 
 function actualizarTotal() {
+  // Show preview total for current selection (before adding to cart)
   const prodId = parseInt(document.getElementById('v-producto').value);
   const cantidad = parseInt(document.getElementById('v-cantidad').value)||1;
   const descuento = cleanPrice(document.getElementById('v-descuento').value)||0;
   const p = products.find(p=>p.id===prodId);
-  if (!p) { document.getElementById('v-total').textContent='$0'; return; }
-  const total = Math.max(0, cleanPrice(p.price||'0') * cantidad - (descuento * cantidad));
-  document.getElementById('v-total').textContent = fmt(total);
+  // Update cart total if items exist
+  if (carrito.length) renderCarrito();
 }
 
 function renderProductSelect() {
@@ -253,41 +397,41 @@ function renderProductSelect() {
 }
 
 async function registrarProspecto() {
-  const prodId   = parseInt(document.getElementById('v-producto').value);
-  const cantidad = parseInt(document.getElementById('v-cantidad').value)||1;
-  const descuento= cleanPrice(document.getElementById('v-descuento').value)||0;
-  const cliente  = document.getElementById('v-cliente').value.trim().toUpperCase();
-  const telefono = document.getElementById('v-telefono').value.trim();
-  const direccion= document.getElementById('v-direccion').value.trim().toUpperCase();
-  const comuna   = document.getElementById('v-comuna').value.trim().toUpperCase();
-  const pago     = document.getElementById('v-pago').value;
-  const msg      = document.getElementById('form-msg');
+  const msg = document.getElementById('form-msg');
+  const pago = document.getElementById('v-pago').value;
 
-  if (!cliente||!telefono||!direccion||!comuna) {
-    msg.className='form-msg err'; msg.textContent='Completa todos los campos.'; return;
+  if (!clienteSeleccionado) {
+    msg.className='form-msg err'; msg.textContent='Selecciona o crea un cliente.'; return;
   }
-  const p = products.find(p=>p.id===prodId);
-  if (!p) { msg.className='form-msg err'; msg.textContent='Selecciona un producto.'; return; }
-  if ((p.stock||0) < cantidad) {
-    msg.className='form-msg err'; msg.textContent='Solo hay '+( p.stock||0)+' unidad(es) disponibles.'; return;
+  if (!carrito.length) {
+    msg.className='form-msg err'; msg.textContent='Agrega al menos un producto al carrito.'; return;
   }
 
   const btn = document.querySelector('.btn-submit');
   btn.disabled=true; btn.textContent='Registrando...';
 
-  const montoBase = cleanPrice(p.price||'0') * cantidad;
-  const montoFinal = Math.max(0, montoBase - (descuento * cantidad));
+  // Descontar stock de cada producto en el carrito
+  carrito.forEach(item => {
+    const p = products.find(p=>p.id===item.productoId);
+    if (p) p.stock = (p.stock||0) - item.cantidad;
+  });
 
-  // Descontar stock al crear prospecto
-  p.stock = (p.stock||0) - cantidad;
+  const montoTotal = carrito.reduce((s,item)=> s + item.precio*item.cantidad - item.descuento*item.cantidad, 0);
+  const productosStr = carrito.map(i=>i.producto+(i.cantidad>1?' x'+i.cantidad:'')).join(', ');
 
   ventas.push({
     fecha: new Date().toLocaleDateString('es-CL'),
     vendedor: currentUser,
-    producto: p.name,
-    cantidad, cliente, telefono, direccion, comuna, pago,
-    descuento: descuento||0,
-    monto: montoFinal,
+    producto: productosStr,
+    cantidad: carrito.reduce((s,i)=>s+i.cantidad,0),
+    items: carrito.map(i=>({producto:i.producto,cantidad:i.cantidad,precio:i.precio,descuento:i.descuento})),
+    cliente: clienteSeleccionado.nombre,
+    telefono: clienteSeleccionado.telefono,
+    direccion: clienteSeleccionado.direccion,
+    comuna: clienteSeleccionado.comuna,
+    pago,
+    descuento: carrito.reduce((s,i)=>s+i.descuento*i.cantidad,0),
+    monto: Math.max(0, montoTotal),
     estado: 'prospecto',
     stockDescontado: true,
   });
@@ -297,17 +441,13 @@ async function registrarProspecto() {
       db.doc('tienda/ventas').set({lista:ventas}),
       db.doc('tienda/productos').set({lista:products}),
     ]);
-    msg.className='form-msg ok'; msg.textContent='📋 Prospecto de "'+p.name+'" registrado. Stock reservado.';
-    document.getElementById('v-cliente').value='';
-    document.getElementById('v-telefono').value='+56';
-    document.getElementById('v-direccion').value='';
-    document.getElementById('v-comuna').value='';
-    document.getElementById('v-cantidad').value='1';
-    document.getElementById('v-descuento').value='$0';
-    actualizarTotal();
+    msg.className='form-msg ok'; msg.textContent='📋 Prospecto registrado para '+clienteSeleccionado.nombre+'.';
+    carrito = [];
+    renderCarrito();
+    limpiarCliente();
     setTimeout(()=>{msg.textContent='';},4000);
   } catch(e) {
-    msg.className='form-msg err'; msg.textContent='Error al guardar. Intenta de nuevo.';
+    msg.className='form-msg err'; msg.textContent='Error al guardar.';
   } finally {
     btn.disabled=false; btn.textContent='Registrar prospecto →';
   }
