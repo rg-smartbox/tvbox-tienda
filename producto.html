@@ -207,6 +207,21 @@ function renderProduct(p) {
       <label>Tu correo electrónico (para el comprobante de pago)</label>
       <input type="email" id="email-input" placeholder="tucorreo@gmail.com">
     </div>
+    <div style="background:rgba(62,207,142,0.08);border:1px solid rgba(62,207,142,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">📦 Datos para programar el despacho</div>
+      <div class="email-wrap" style="margin-bottom:10px;">
+        <label>Teléfono</label>
+        <input type="tel" id="telefono-input" placeholder="+56912345678" value="+56">
+      </div>
+      <div class="email-wrap" style="margin-bottom:10px;">
+        <label>Dirección</label>
+        <input type="text" id="direccion-input" placeholder="Calle, número" style="text-transform:uppercase;">
+      </div>
+      <div class="email-wrap">
+        <label>Comuna</label>
+        <input type="text" id="comuna-input" placeholder="ej: Santiago" style="text-transform:uppercase;">
+      </div>
+    </div>
     <button class="btn-pay" onclick="pagarConFlow()" id="btn-pagar">
       💳 Pagar con Flow
     </button>
@@ -242,15 +257,39 @@ window.cambiarCantidad = function(dir) {
 
 window.pagarConFlow = async function() {
   const email = document.getElementById('email-input').value.trim();
+  const telefono = document.getElementById('telefono-input').value.trim();
+  const direccion = document.getElementById('direccion-input').value.trim().toUpperCase();
+  const comuna = document.getElementById('comuna-input').value.trim().toUpperCase();
   const msg = document.getElementById('pay-msg');
+  
   if (!email || !email.includes('@')) {
     msg.className='pay-msg err'; msg.textContent='Ingresa un correo válido.'; return;
   }
+  if (!telefono || !direccion || !comuna) {
+    msg.className='pay-msg err'; msg.textContent='Completa todos los datos para el despacho.'; return;
+  }
+
   const btn = document.getElementById('btn-pagar');
   btn.disabled = true; btn.textContent = '⏳ Procesando...';
   msg.className='pay-msg'; msg.textContent='';
+  
   const precio = cleanPrice(currentProduct.price || '0');
   const orderId = 'RGS-' + Date.now();
+  const nombre = currentProduct.name;
+  
+  // Guardar datos en sessionStorage para después del pago
+  sessionStorage.setItem('compra', JSON.stringify({
+    orderId,
+    email,
+    telefono,
+    direccion,
+    comuna,
+    producto: nombre,
+    cantidad,
+    monto: precio * cantidad,
+    productId: currentProduct.id,
+  }));
+
   try {
     const res = await fetch(`${FLOW_API}/api/create-payment`, {
       method: 'POST',
@@ -259,8 +298,8 @@ window.pagarConFlow = async function() {
         amount: precio * cantidad,
         email,
         orderId,
-        subject: currentProduct.name + (cantidad > 1 ? ' x' + cantidad : ''),
-        urlReturn: 'https://rg-smartbox.github.io/tvbox-tienda/gracias.html',
+        subject: nombre + (cantidad > 1 ? ' x' + cantidad : ''),
+        urlReturn: 'https://rg-smartbox.github.io/tvbox-tienda/gracias.html?orderId=' + orderId,
       }),
     });
     const data = await res.json();

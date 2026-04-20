@@ -17,9 +17,11 @@
   .status.ok { background: rgba(62,207,142,0.1); color: var(--good); border: 1px solid rgba(62,207,142,0.25); }
   .status.pending { background: rgba(245,196,0,0.1); color: var(--accent); border: 1px solid rgba(245,196,0,0.25); }
   .status.err { background: rgba(255,102,102,0.1); color: var(--bad); border: 1px solid rgba(255,102,102,0.25); }
-  .btn { display: inline-block; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+  .btn { display: inline-block; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; margin: 6px; }
   .btn-primary { background: var(--accent); color: #050a1a; }
-  .btn-secondary { background: none; color: var(--muted); border: 1px solid var(--border); margin-left: 8px; }
+  .btn-secondary { background: none; color: var(--muted); border: 1px solid var(--border); }
+  .btn-wa { background: #25d366; color: white; }
+  .acciones { margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -28,50 +30,144 @@
   <h1 id="titulo">Verificando pago...</h1>
   <p id="mensaje">Estamos confirmando tu pago con Flow.</p>
   <div id="status-badge"></div>
-  <div id="acciones" style="display:none;">
-    <a href="index.html" class="btn btn-primary">Ver más productos</a>
-  </div>
+  <div id="acciones" class="acciones" style="display:none;"></div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDhyUnOAfLaenLwC_5ekkPJjvlhpLg_RS4",
+  authDomain: "tvbox-tienda.firebaseapp.com",
+  projectId: "tvbox-tienda",
+  storageBucket: "tvbox-tienda.firebasestorage.app",
+  messagingSenderId: "621421300942",
+  appId: "1:621421300942:web:a7eef5446ac6343f1c949f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const FLOW_API = 'https://rg-smartbox-api.vercel.app';
 const params = new URLSearchParams(window.location.search);
 const token = params.get('token');
+const orderId = params.get('orderId');
+
+async function guardarVenta(compra, estado) {
+  try {
+    const ventasSnap = await getDoc(doc(db, 'tienda', 'ventas'));
+    let ventas = ventasSnap.exists() ? (ventasSnap.data().lista || []) : [];
+    const clientesSnap = await getDoc(doc(db, 'tienda', 'clientes'));
+    let clientes = clientesSnap.exists() ? (clientesSnap.data().lista || []) : [];
+    const prodSnap = await getDoc(doc(db, 'tienda', 'productos'));
+    let productos = prodSnap.exists() ? (prodSnap.data().lista || []) : [];
+
+    // Guardar cliente si no existe
+    const clienteExistente = clientes.find(c => c.telefono === compra.telefono);
+    if (!clienteExistente) {
+      clientes.push({
+        nombre: compra.nombre || 'Cliente',
+        telefono: compra.telefono,
+        direccion: compra.direccion,
+        comuna: compra.comuna,
+      });
+      await setDoc(doc(db, 'tienda', 'clientes'), { lista: clientes });
+    }
+
+    // Descontar stock
+    const producto = productos.find(p => p.id === compra.productId);
+    if (producto) {
+      producto.stock = Math.max(0, (producto.stock || 0) - compra.cantidad);
+      await setDoc(doc(db, 'tienda', 'productos'), { lista: productos });
+    }
+
+    // Guardar venta
+    ventas.push({
+      fecha: new Date().toLocaleDateString('es-CL'),
+      vendedor: 'Página web',
+      producto: compra.producto,
+      cantidad: compra.cantidad,
+      cliente: compra.nombre || 'Cliente web',
+      telefono: compra.telefono,
+      direccion: compra.direccion,
+      comuna: compra.comuna,
+      pago: 'Flow',
+      descuento: 0,
+      monto: compra.monto,
+      estado,
+      stockDescontado: true,
+      orderId: compra.orderId,
+    });
+    await setDoc(doc(db, 'tienda', 'ventas'), { lista: ventas });
+    return true;
+  } catch (e) {
+    console.error('Error guardando venta:', e);
+    return false;
+  }
+}
 
 async function verificar() {
+  const compra = JSON.parse(sessionStorage.getItem('compra') || '{}');
+  const acciones = document.getElementById('acciones');
+  const waNumber = '56912345678'; // TODO: obtener desde config
+
   if (!token) {
     document.getElementById('icon').textContent = '✅';
     document.getElementById('titulo').textContent = '¡Gracias por tu interés!';
     document.getElementById('mensaje').textContent = 'Nos pondremos en contacto contigo pronto para coordinar tu compra.';
-    document.getElementById('acciones').style.display = 'block';
+    acciones.innerHTML = '<a href="index.html" class="btn btn-primary">Ver más productos</a>';
+    acciones.style.display = 'block';
     return;
   }
+
   try {
     const res = await fetch(`${FLOW_API}/api/payment-status?token=${token}`);
     const data = await res.json();
     const badge = document.getElementById('status-badge');
+    let estado = 'prospecto';
+    let guardado = false;
+
     if (data.status === 2) {
       document.getElementById('icon').textContent = '🎉';
       document.getElementById('titulo').textContent = '¡Pago exitoso!';
-      document.getElementById('mensaje').textContent = 'Tu pago fue procesado correctamente. Nos contactaremos contigo para coordinar la entrega.';
+      document.getElementById('mensaje').textContent = 'Tu pago fue procesado correctamente. Te contactaremos pronto para coordinar la entrega.';
       badge.innerHTML = '<div class="status ok">✅ Pago confirmado</div>';
+      estado = 'venta';
+      guardado = await guardarVenta(compra, estado);
     } else if (data.status === 1) {
       document.getElementById('icon').textContent = '⏳';
       document.getElementById('titulo').textContent = 'Pago pendiente';
       document.getElementById('mensaje').textContent = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.';
       badge.innerHTML = '<div class="status pending">⏳ Pendiente de confirmación</div>';
+      guardado = await guardarVenta(compra, 'prospecto');
     } else {
       document.getElementById('icon').textContent = '❌';
       document.getElementById('titulo').textContent = 'Pago no completado';
       document.getElementById('mensaje').textContent = 'El pago no fue completado. Puedes intentarlo de nuevo o contactarnos por WhatsApp.';
       badge.innerHTML = '<div class="status err">❌ No completado</div>';
     }
+
+    if (guardado && compra.telefono) {
+      const msg = \`Hola! Acabo de realizar una compra en RG SmartBox:\n\n📦 \${compra.producto}\n💵 Total: $\${compra.monto.toLocaleString('es-CL')}\n\nNecesito coordinar el despacho.\`;
+      acciones.innerHTML = \`
+        <a href="https://wa.me/\${waNumber}?text=\${encodeURIComponent(msg)}" target="_blank" class="btn btn-wa">
+          💬 Contactar por WhatsApp
+        </a>
+      \`;
+    }
+
+    acciones.innerHTML += '<a href="index.html" class="btn btn-secondary">Ver más productos</a>';
+    acciones.style.display = 'block';
   } catch(e) {
+    console.error('Error verificando pago:', e);
     document.getElementById('icon').textContent = '✅';
     document.getElementById('titulo').textContent = '¡Gracias por tu compra!';
     document.getElementById('mensaje').textContent = 'Nos contactaremos contigo para coordinar la entrega.';
+    acciones.innerHTML = '<a href="index.html" class="btn btn-primary">Ver más productos</a>';
+    acciones.style.display = 'block';
   }
-  document.getElementById('acciones').style.display = 'block';
+
+  sessionStorage.removeItem('compra');
 }
 
 verificar();
