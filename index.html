@@ -261,7 +261,7 @@ function renderGrid(products, cfg) {
     const videoId = getYoutubeId(p.video || '');
     let mediaHtml = photos.length > 0
       ? `<div class="gallery">
-          ${photos.map((u,i) => `<img src="${u}" class="${i===0?'active':''}" style="cursor:pointer;" onclick="abrirFoto('${u}')">`).join('')}
+          ${photos.map((u,i) => `<img src="${u}" class="${i===0?'active':''}" style="cursor:pointer;" onclick="abrirFoto('${u.replace(/'/g, "\\'")}')">`).join('')}
           ${photos.length > 1 ? `<button class="gallery-btn prev" onclick="galleryMove(this,-1)">&#8249;</button><button class="gallery-btn next" onclick="galleryMove(this,1)">&#8250;</button><div class="gallery-dots">${photos.map((_,i)=>`<span class="gallery-dot ${i===0?'active':''}"></span>`).join('')}</div>` : ''}
         </div>`
       : `<div class="gallery-placeholder">${ICONS[p.tag]||'📺'}</div>`;
